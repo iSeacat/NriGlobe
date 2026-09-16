@@ -341,6 +341,29 @@ def parse_social(path: Path, res: MarketResolver) -> tuple[list[dict], list[str]
     return items, warnings
 
 
+# ------------------------------------------------- 私有产品线合并
+# 公开仓库的 markets.json 只含通用国家/地区数据；真实产品线 → 默认市场映射
+# 放在私有文件（默认 content/markets.local.json，已 gitignore），不存在时
+# 退回 content/markets.example.json（中性示例）。这样产品线不会进公开仓库。
+def merge_private_markets(cfg: dict, public: bool = False) -> dict:
+    # public=True：只合并中性示例，绝不读取私有产品线（用于生成可公开的示例数据）
+    names = ("markets.example.json",) if public else ("markets.local.json", "markets.example.json")
+    for name in names:
+        p = CONTENT / name
+        if p.exists():
+            try:
+                extra = json.loads(p.read_text(encoding="utf-8"))
+            except Exception as exc:  # noqa: BLE001
+                print(f"  ! 读取 {name} 失败：{exc}")
+                continue
+            for key in ("line_default_markets", "product_lines"):
+                if extra.get(key):
+                    cfg.setdefault(key, {})
+                    cfg[key].update(extra[key])
+            break
+    return cfg
+
+
 # ---------------------------------------------------------------- 主流程
 def main() -> int:
     ap = argparse.ArgumentParser()
@@ -348,9 +371,12 @@ def main() -> int:
     ap.add_argument("--social", default=str(DEFAULT_SOCIAL))
     ap.add_argument("--out", default=str(DATA / "dataset.js"),
                     help="输出路径，默认 data/dataset.js")
+    ap.add_argument("--public", action="store_true",
+                    help="只用中性示例产品线，不读私有 markets.local.json（生成可公开数据时用）")
     args = ap.parse_args()
 
     cfg = json.loads((CONTENT / "markets.json").read_text(encoding="utf-8"))
+    cfg = merge_private_markets(cfg, public=args.public)
     res = MarketResolver(cfg)
 
     news_dir, social_dir = Path(args.news), Path(args.social)

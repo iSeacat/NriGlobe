@@ -1,77 +1,726 @@
 {
   "meta": {
     "owner": "NRI",
-    "note": "跨境情报地球的市场坐标表。lat/lon 为国家/地区近似质心，仅用于地图打点，不代表精确地理位置。香港、澳门、台湾均为中国的一部分，不作为独立市场，相关提及统一归入中国。",
+    "note": "跨境情报地球的市场坐标表。lat/lon 为国家/地区近似质心，仅用于地图打点，不代表精确地理位置。香港、澳门、台湾均为中国的一部分，不作为独立市场，相关提及统一归入中国。 产品线→默认市场映射不在此文件：见 markets.example.json（示例）或私有的 markets.local.json。",
     "version": "2026-09-14"
   },
-  "core_markets": ["美国", "英国", "德国", "日本", "澳大利亚"],
-  "global_expand": ["US", "EU", "JP", "AU"],
-  "line_default_markets": {
-    "示例产品线A": ["US", "EU", "JP", "AU", "VN", "TH", "MY"],
-    "示例产品线B": ["US", "EU", "AU"],
-    "示例产品线C": ["US", "EU", "AU"]
-  },
-  "markets": [
-    { "id": "US", "name": "美国", "en": "United States", "lat": 39.8, "lon": -98.6, "region": "北美", "aliases": ["美国", "USA", "US", "U.S.", "United States", "美", "北美", "CPSC"] },
-    { "id": "CA", "name": "加拿大", "en": "Canada", "lat": 56.1, "lon": -106.3, "region": "北美", "aliases": ["加拿大", "Canada", "CA", "加"] },
-    { "id": "MX", "name": "墨西哥", "en": "Mexico", "lat": 23.6, "lon": -102.5, "region": "拉美", "aliases": ["墨西哥", "Mexico", "MX"] },
-    { "id": "BR", "name": "巴西", "en": "Brazil", "lat": -14.2, "lon": -51.9, "region": "拉美", "aliases": ["巴西", "Brazil", "BR"] },
-    { "id": "AR", "name": "阿根廷", "en": "Argentina", "lat": -38.4, "lon": -63.6, "region": "拉美", "aliases": ["阿根廷", "Argentina"] },
-    { "id": "CL", "name": "智利", "en": "Chile", "lat": -35.7, "lon": -71.5, "region": "拉美", "aliases": ["智利", "Chile"] },
-
-    { "id": "GB", "name": "英国", "en": "United Kingdom", "lat": 54.0, "lon": -2.5, "region": "欧洲", "aliases": ["英国", "UK", "United Kingdom", "Britain", "英", "MHRA"] },
-    { "id": "EU", "name": "欧洲", "en": "Europe (EU)", "lat": 50.5, "lon": 9.0, "region": "欧洲", "aliases": ["欧洲", "欧盟", "EU", "Europe", "欧", "西欧", "中区欧洲", "欧洲/英国", "Eurozone", "CE"] },
-    { "id": "DE", "name": "德国", "en": "Germany", "lat": 51.2, "lon": 10.5, "region": "欧洲", "aliases": ["德国", "Germany", "DE", "德"] },
-    { "id": "FR", "name": "法国", "en": "France", "lat": 46.6, "lon": 2.2, "region": "欧洲", "aliases": ["法国", "France", "FR", "法"] },
-    { "id": "IT", "name": "意大利", "en": "Italy", "lat": 41.9, "lon": 12.6, "region": "欧洲", "aliases": ["意大利", "Italy", "IT"] },
-    { "id": "ES", "name": "西班牙", "en": "Spain", "lat": 40.5, "lon": -3.7, "region": "欧洲", "aliases": ["西班牙", "Spain", "ES"] },
-    { "id": "NL", "name": "荷兰", "en": "Netherlands", "lat": 52.1, "lon": 5.3, "region": "欧洲", "aliases": ["荷兰", "Netherlands", "NL"] },
-    { "id": "PL", "name": "波兰", "en": "Poland", "lat": 51.9, "lon": 19.1, "region": "欧洲", "aliases": ["波兰", "Poland", "PL"] },
-    { "id": "SE", "name": "瑞典", "en": "Sweden", "lat": 60.1, "lon": 18.6, "region": "欧洲", "aliases": ["瑞典", "Sweden", "SE"] },
-    { "id": "NO", "name": "挪威", "en": "Norway", "lat": 60.5, "lon": 8.5, "region": "欧洲", "aliases": ["挪威", "Norway", "NO"] },
-    { "id": "DK", "name": "丹麦", "en": "Denmark", "lat": 56.3, "lon": 9.5, "region": "欧洲", "aliases": ["丹麦", "Denmark", "DK"] },
-    { "id": "IE", "name": "爱尔兰", "en": "Ireland", "lat": 53.1, "lon": -7.7, "region": "欧洲", "aliases": ["爱尔兰", "Ireland", "IE"] },
-    { "id": "CH", "name": "瑞士", "en": "Switzerland", "lat": 46.8, "lon": 8.2, "region": "欧洲", "aliases": ["瑞士", "Switzerland", "CH"] },
-    { "id": "AT", "name": "奥地利", "en": "Austria", "lat": 47.5, "lon": 14.6, "region": "欧洲", "aliases": ["奥地利", "Austria", "AT"] },
-    { "id": "BE", "name": "比利时", "en": "Belgium", "lat": 50.5, "lon": 4.5, "region": "欧洲", "aliases": ["比利时", "Belgium", "BE"] },
-    { "id": "PT", "name": "葡萄牙", "en": "Portugal", "lat": 39.4, "lon": -8.2, "region": "欧洲", "aliases": ["葡萄牙", "Portugal", "PT"] },
-    { "id": "FI", "name": "芬兰", "en": "Finland", "lat": 61.9, "lon": 25.7, "region": "欧洲", "aliases": ["芬兰", "Finland", "FI"] },
-    { "id": "CZ", "name": "捷克", "en": "Czechia", "lat": 49.8, "lon": 15.5, "region": "欧洲", "aliases": ["捷克", "Czechia", "Czech"] },
-    { "id": "HU", "name": "匈牙利", "en": "Hungary", "lat": 47.2, "lon": 19.5, "region": "欧洲", "aliases": ["匈牙利", "Hungary"] },
-
-    { "id": "AE", "name": "阿联酋", "en": "United Arab Emirates", "lat": 23.4, "lon": 53.8, "region": "中东非洲", "aliases": ["阿联酋", "UAE", "迪拜", "Dubai"] },
-    { "id": "SA", "name": "沙特", "en": "Saudi Arabia", "lat": 23.9, "lon": 45.1, "region": "中东非洲", "aliases": ["沙特", "Saudi", "沙特阿拉伯", "Saudi Arabia"] },
-    { "id": "IL", "name": "以色列", "en": "Israel", "lat": 31.0, "lon": 34.9, "region": "中东非洲", "aliases": ["以色列", "Israel"] },
-    { "id": "TR", "name": "土耳其", "en": "Türkiye", "lat": 39.0, "lon": 35.2, "region": "中东非洲", "aliases": ["土耳其", "Turkey", "Türkiye"] },
-    { "id": "ZA", "name": "南非", "en": "South Africa", "lat": -30.6, "lon": 22.9, "region": "中东非洲", "aliases": ["南非", "South Africa"] },
-    { "id": "EG", "name": "埃及", "en": "Egypt", "lat": 26.8, "lon": 30.8, "region": "中东非洲", "aliases": ["埃及", "Egypt"] },
-    { "id": "NG", "name": "尼日利亚", "en": "Nigeria", "lat": 9.1, "lon": 8.7, "region": "中东非洲", "aliases": ["尼日利亚", "Nigeria"] },
-    { "id": "KE", "name": "肯尼亚", "en": "Kenya", "lat": -0.02, "lon": 37.9, "region": "中东非洲", "aliases": ["肯尼亚", "Kenya"] },
-    { "id": "MA", "name": "摩洛哥", "en": "Morocco", "lat": 31.8, "lon": -7.1, "region": "中东非洲", "aliases": ["摩洛哥", "Morocco"] },
-
-    { "id": "CN", "name": "中国", "en": "China", "lat": 34.5, "lon": 104.0, "region": "中国与东亚", "aliases": ["中国", "China", "CN", "大陆", "中国内地", "MOFCOM", "商务部"] },
-    { "id": "JP", "name": "日本", "en": "Japan", "lat": 36.2, "lon": 138.3, "region": "中国与东亚", "aliases": ["日本", "Japan", "JP", "日", "日文", "敬老日"] },
-    { "id": "KR", "name": "韩国", "en": "South Korea", "lat": 36.5, "lon": 127.9, "region": "中国与东亚", "aliases": ["韩国", "Korea", "South Korea", "韩", "韩文", "Chuseok", "秋夕"] },
-
-    { "id": "IN", "name": "印度", "en": "India", "lat": 20.6, "lon": 79.0, "region": "南亚东南亚", "aliases": ["印度", "India", "IN", "Diwali", "排灯节", "Navratri", "Durga Puja"] },
-    { "id": "PK", "name": "巴基斯坦", "en": "Pakistan", "lat": 30.4, "lon": 69.3, "region": "南亚东南亚", "aliases": ["巴基斯坦", "Pakistan"] },
-    { "id": "BD", "name": "孟加拉", "en": "Bangladesh", "lat": 23.7, "lon": 90.4, "region": "南亚东南亚", "aliases": ["孟加拉", "Bangladesh"] },
-    { "id": "VN", "name": "越南", "en": "Vietnam", "lat": 14.1, "lon": 108.3, "region": "南亚东南亚", "aliases": ["越南", "Vietnam", "VN", "越", "越南文"] },
-    { "id": "TH", "name": "泰国", "en": "Thailand", "lat": 15.9, "lon": 101.0, "region": "南亚东南亚", "aliases": ["泰国", "Thailand", "TH", "泰", "泰文", "TMD", "Thaimart"] },
-    { "id": "MY", "name": "马来西亚", "en": "Malaysia", "lat": 4.2, "lon": 101.9, "region": "南亚东南亚", "aliases": ["马来西亚", "Malaysia", "MY", "马", "大马"] },
-    { "id": "SG", "name": "新加坡", "en": "Singapore", "lat": 1.35, "lon": 103.8, "region": "南亚东南亚", "aliases": ["新加坡", "Singapore", "SG", "新"] },
-    { "id": "PH", "name": "菲律宾", "en": "Philippines", "lat": 12.9, "lon": 121.8, "region": "南亚东南亚", "aliases": ["菲律宾", "Philippines", "PH", "菲", "PAGASA"] },
-    { "id": "ID", "name": "印度尼西亚", "en": "Indonesia", "lat": -0.8, "lon": 113.9, "region": "南亚东南亚", "aliases": ["印尼", "印度尼西亚", "Indonesia", "ID"] },
-
-    { "id": "AU", "name": "澳大利亚", "en": "Australia", "lat": -25.3, "lon": 133.8, "region": "大洋洲", "aliases": ["澳大利亚", "澳洲", "Australia", "AU", "澳", "AusPost", "Australia Post", "business.gov.au", "BOM", "TGA"] },
-    { "id": "NZ", "name": "新西兰", "en": "New Zealand", "lat": -40.9, "lon": 174.9, "region": "大洋洲", "aliases": ["新西兰", "New Zealand", "NZ", "纽西兰"] },
-
-    { "id": "RU", "name": "俄罗斯", "en": "Russia", "lat": 61.5, "lon": 105.3, "region": "欧亚", "aliases": ["俄罗斯", "Russia", "RU"] },
-    { "id": "ZZ", "name": "全球", "en": "Global", "lat": 8.0, "lon": 0.0, "region": "全球", "aliases": ["全球", "世界", "Global", "World", "全球（银发核心）", "欧美", "欧美高端", "通用", "ALL", "所有国家", "多国"] }
+  "core_markets": [
+    "美国",
+    "英国",
+    "德国",
+    "日本",
+    "澳大利亚"
   ],
-  "product_lines": {
-    "示例产品线B": "示例产品线B / Outdoor Spa",
-    "示例产品线A": "示例产品线A / Bike Parts",
-    "示例产品线C": "家用外用物理器械 / Medical Device"
-  }
+  "global_expand": [
+    "US",
+    "EU",
+    "JP",
+    "AU"
+  ],
+  "line_default_markets": {},
+  "markets": [
+    {
+      "id": "US",
+      "name": "美国",
+      "en": "United States",
+      "lat": 39.8,
+      "lon": -98.6,
+      "region": "北美",
+      "aliases": [
+        "美国",
+        "USA",
+        "US",
+        "U.S.",
+        "United States",
+        "美",
+        "北美",
+        "CPSC"
+      ]
+    },
+    {
+      "id": "CA",
+      "name": "加拿大",
+      "en": "Canada",
+      "lat": 56.1,
+      "lon": -106.3,
+      "region": "北美",
+      "aliases": [
+        "加拿大",
+        "Canada",
+        "CA",
+        "加"
+      ]
+    },
+    {
+      "id": "MX",
+      "name": "墨西哥",
+      "en": "Mexico",
+      "lat": 23.6,
+      "lon": -102.5,
+      "region": "拉美",
+      "aliases": [
+        "墨西哥",
+        "Mexico",
+        "MX"
+      ]
+    },
+    {
+      "id": "BR",
+      "name": "巴西",
+      "en": "Brazil",
+      "lat": -14.2,
+      "lon": -51.9,
+      "region": "拉美",
+      "aliases": [
+        "巴西",
+        "Brazil",
+        "BR"
+      ]
+    },
+    {
+      "id": "AR",
+      "name": "阿根廷",
+      "en": "Argentina",
+      "lat": -38.4,
+      "lon": -63.6,
+      "region": "拉美",
+      "aliases": [
+        "阿根廷",
+        "Argentina"
+      ]
+    },
+    {
+      "id": "CL",
+      "name": "智利",
+      "en": "Chile",
+      "lat": -35.7,
+      "lon": -71.5,
+      "region": "拉美",
+      "aliases": [
+        "智利",
+        "Chile"
+      ]
+    },
+    {
+      "id": "GB",
+      "name": "英国",
+      "en": "United Kingdom",
+      "lat": 54.0,
+      "lon": -2.5,
+      "region": "欧洲",
+      "aliases": [
+        "英国",
+        "UK",
+        "United Kingdom",
+        "Britain",
+        "英",
+        "MHRA"
+      ]
+    },
+    {
+      "id": "EU",
+      "name": "欧洲",
+      "en": "Europe (EU)",
+      "lat": 50.5,
+      "lon": 9.0,
+      "region": "欧洲",
+      "aliases": [
+        "欧洲",
+        "欧盟",
+        "EU",
+        "Europe",
+        "欧",
+        "西欧",
+        "中区欧洲",
+        "欧洲/英国",
+        "Eurozone",
+        "CE"
+      ]
+    },
+    {
+      "id": "DE",
+      "name": "德国",
+      "en": "Germany",
+      "lat": 51.2,
+      "lon": 10.5,
+      "region": "欧洲",
+      "aliases": [
+        "德国",
+        "Germany",
+        "DE",
+        "德"
+      ]
+    },
+    {
+      "id": "FR",
+      "name": "法国",
+      "en": "France",
+      "lat": 46.6,
+      "lon": 2.2,
+      "region": "欧洲",
+      "aliases": [
+        "法国",
+        "France",
+        "FR",
+        "法"
+      ]
+    },
+    {
+      "id": "IT",
+      "name": "意大利",
+      "en": "Italy",
+      "lat": 41.9,
+      "lon": 12.6,
+      "region": "欧洲",
+      "aliases": [
+        "意大利",
+        "Italy",
+        "IT"
+      ]
+    },
+    {
+      "id": "ES",
+      "name": "西班牙",
+      "en": "Spain",
+      "lat": 40.5,
+      "lon": -3.7,
+      "region": "欧洲",
+      "aliases": [
+        "西班牙",
+        "Spain",
+        "ES"
+      ]
+    },
+    {
+      "id": "NL",
+      "name": "荷兰",
+      "en": "Netherlands",
+      "lat": 52.1,
+      "lon": 5.3,
+      "region": "欧洲",
+      "aliases": [
+        "荷兰",
+        "Netherlands",
+        "NL"
+      ]
+    },
+    {
+      "id": "PL",
+      "name": "波兰",
+      "en": "Poland",
+      "lat": 51.9,
+      "lon": 19.1,
+      "region": "欧洲",
+      "aliases": [
+        "波兰",
+        "Poland",
+        "PL"
+      ]
+    },
+    {
+      "id": "SE",
+      "name": "瑞典",
+      "en": "Sweden",
+      "lat": 60.1,
+      "lon": 18.6,
+      "region": "欧洲",
+      "aliases": [
+        "瑞典",
+        "Sweden",
+        "SE"
+      ]
+    },
+    {
+      "id": "NO",
+      "name": "挪威",
+      "en": "Norway",
+      "lat": 60.5,
+      "lon": 8.5,
+      "region": "欧洲",
+      "aliases": [
+        "挪威",
+        "Norway",
+        "NO"
+      ]
+    },
+    {
+      "id": "DK",
+      "name": "丹麦",
+      "en": "Denmark",
+      "lat": 56.3,
+      "lon": 9.5,
+      "region": "欧洲",
+      "aliases": [
+        "丹麦",
+        "Denmark",
+        "DK"
+      ]
+    },
+    {
+      "id": "IE",
+      "name": "爱尔兰",
+      "en": "Ireland",
+      "lat": 53.1,
+      "lon": -7.7,
+      "region": "欧洲",
+      "aliases": [
+        "爱尔兰",
+        "Ireland",
+        "IE"
+      ]
+    },
+    {
+      "id": "CH",
+      "name": "瑞士",
+      "en": "Switzerland",
+      "lat": 46.8,
+      "lon": 8.2,
+      "region": "欧洲",
+      "aliases": [
+        "瑞士",
+        "Switzerland",
+        "CH"
+      ]
+    },
+    {
+      "id": "AT",
+      "name": "奥地利",
+      "en": "Austria",
+      "lat": 47.5,
+      "lon": 14.6,
+      "region": "欧洲",
+      "aliases": [
+        "奥地利",
+        "Austria",
+        "AT"
+      ]
+    },
+    {
+      "id": "BE",
+      "name": "比利时",
+      "en": "Belgium",
+      "lat": 50.5,
+      "lon": 4.5,
+      "region": "欧洲",
+      "aliases": [
+        "比利时",
+        "Belgium",
+        "BE"
+      ]
+    },
+    {
+      "id": "PT",
+      "name": "葡萄牙",
+      "en": "Portugal",
+      "lat": 39.4,
+      "lon": -8.2,
+      "region": "欧洲",
+      "aliases": [
+        "葡萄牙",
+        "Portugal",
+        "PT"
+      ]
+    },
+    {
+      "id": "FI",
+      "name": "芬兰",
+      "en": "Finland",
+      "lat": 61.9,
+      "lon": 25.7,
+      "region": "欧洲",
+      "aliases": [
+        "芬兰",
+        "Finland",
+        "FI"
+      ]
+    },
+    {
+      "id": "CZ",
+      "name": "捷克",
+      "en": "Czechia",
+      "lat": 49.8,
+      "lon": 15.5,
+      "region": "欧洲",
+      "aliases": [
+        "捷克",
+        "Czechia",
+        "Czech"
+      ]
+    },
+    {
+      "id": "HU",
+      "name": "匈牙利",
+      "en": "Hungary",
+      "lat": 47.2,
+      "lon": 19.5,
+      "region": "欧洲",
+      "aliases": [
+        "匈牙利",
+        "Hungary"
+      ]
+    },
+    {
+      "id": "AE",
+      "name": "阿联酋",
+      "en": "United Arab Emirates",
+      "lat": 23.4,
+      "lon": 53.8,
+      "region": "中东非洲",
+      "aliases": [
+        "阿联酋",
+        "UAE",
+        "迪拜",
+        "Dubai"
+      ]
+    },
+    {
+      "id": "SA",
+      "name": "沙特",
+      "en": "Saudi Arabia",
+      "lat": 23.9,
+      "lon": 45.1,
+      "region": "中东非洲",
+      "aliases": [
+        "沙特",
+        "Saudi",
+        "沙特阿拉伯",
+        "Saudi Arabia"
+      ]
+    },
+    {
+      "id": "IL",
+      "name": "以色列",
+      "en": "Israel",
+      "lat": 31.0,
+      "lon": 34.9,
+      "region": "中东非洲",
+      "aliases": [
+        "以色列",
+        "Israel"
+      ]
+    },
+    {
+      "id": "TR",
+      "name": "土耳其",
+      "en": "Türkiye",
+      "lat": 39.0,
+      "lon": 35.2,
+      "region": "中东非洲",
+      "aliases": [
+        "土耳其",
+        "Turkey",
+        "Türkiye"
+      ]
+    },
+    {
+      "id": "ZA",
+      "name": "南非",
+      "en": "South Africa",
+      "lat": -30.6,
+      "lon": 22.9,
+      "region": "中东非洲",
+      "aliases": [
+        "南非",
+        "South Africa"
+      ]
+    },
+    {
+      "id": "EG",
+      "name": "埃及",
+      "en": "Egypt",
+      "lat": 26.8,
+      "lon": 30.8,
+      "region": "中东非洲",
+      "aliases": [
+        "埃及",
+        "Egypt"
+      ]
+    },
+    {
+      "id": "NG",
+      "name": "尼日利亚",
+      "en": "Nigeria",
+      "lat": 9.1,
+      "lon": 8.7,
+      "region": "中东非洲",
+      "aliases": [
+        "尼日利亚",
+        "Nigeria"
+      ]
+    },
+    {
+      "id": "KE",
+      "name": "肯尼亚",
+      "en": "Kenya",
+      "lat": -0.02,
+      "lon": 37.9,
+      "region": "中东非洲",
+      "aliases": [
+        "肯尼亚",
+        "Kenya"
+      ]
+    },
+    {
+      "id": "MA",
+      "name": "摩洛哥",
+      "en": "Morocco",
+      "lat": 31.8,
+      "lon": -7.1,
+      "region": "中东非洲",
+      "aliases": [
+        "摩洛哥",
+        "Morocco"
+      ]
+    },
+    {
+      "id": "CN",
+      "name": "中国",
+      "en": "China",
+      "lat": 34.5,
+      "lon": 104.0,
+      "region": "中国与东亚",
+      "aliases": [
+        "中国",
+        "China",
+        "CN",
+        "大陆",
+        "中国内地",
+        "MOFCOM",
+        "商务部"
+      ]
+    },
+    {
+      "id": "JP",
+      "name": "日本",
+      "en": "Japan",
+      "lat": 36.2,
+      "lon": 138.3,
+      "region": "中国与东亚",
+      "aliases": [
+        "日本",
+        "Japan",
+        "JP",
+        "日",
+        "日文",
+        "敬老日"
+      ]
+    },
+    {
+      "id": "KR",
+      "name": "韩国",
+      "en": "South Korea",
+      "lat": 36.5,
+      "lon": 127.9,
+      "region": "中国与东亚",
+      "aliases": [
+        "韩国",
+        "Korea",
+        "South Korea",
+        "韩",
+        "韩文",
+        "Chuseok",
+        "秋夕"
+      ]
+    },
+    {
+      "id": "IN",
+      "name": "印度",
+      "en": "India",
+      "lat": 20.6,
+      "lon": 79.0,
+      "region": "南亚东南亚",
+      "aliases": [
+        "印度",
+        "India",
+        "IN",
+        "Diwali",
+        "排灯节",
+        "Navratri",
+        "Durga Puja"
+      ]
+    },
+    {
+      "id": "PK",
+      "name": "巴基斯坦",
+      "en": "Pakistan",
+      "lat": 30.4,
+      "lon": 69.3,
+      "region": "南亚东南亚",
+      "aliases": [
+        "巴基斯坦",
+        "Pakistan"
+      ]
+    },
+    {
+      "id": "BD",
+      "name": "孟加拉",
+      "en": "Bangladesh",
+      "lat": 23.7,
+      "lon": 90.4,
+      "region": "南亚东南亚",
+      "aliases": [
+        "孟加拉",
+        "Bangladesh"
+      ]
+    },
+    {
+      "id": "VN",
+      "name": "越南",
+      "en": "Vietnam",
+      "lat": 14.1,
+      "lon": 108.3,
+      "region": "南亚东南亚",
+      "aliases": [
+        "越南",
+        "Vietnam",
+        "VN",
+        "越",
+        "越南文"
+      ]
+    },
+    {
+      "id": "TH",
+      "name": "泰国",
+      "en": "Thailand",
+      "lat": 15.9,
+      "lon": 101.0,
+      "region": "南亚东南亚",
+      "aliases": [
+        "泰国",
+        "Thailand",
+        "TH",
+        "泰",
+        "泰文",
+        "TMD",
+        "Thaimart"
+      ]
+    },
+    {
+      "id": "MY",
+      "name": "马来西亚",
+      "en": "Malaysia",
+      "lat": 4.2,
+      "lon": 101.9,
+      "region": "南亚东南亚",
+      "aliases": [
+        "马来西亚",
+        "Malaysia",
+        "MY",
+        "马",
+        "大马"
+      ]
+    },
+    {
+      "id": "SG",
+      "name": "新加坡",
+      "en": "Singapore",
+      "lat": 1.35,
+      "lon": 103.8,
+      "region": "南亚东南亚",
+      "aliases": [
+        "新加坡",
+        "Singapore",
+        "SG",
+        "新"
+      ]
+    },
+    {
+      "id": "PH",
+      "name": "菲律宾",
+      "en": "Philippines",
+      "lat": 12.9,
+      "lon": 121.8,
+      "region": "南亚东南亚",
+      "aliases": [
+        "菲律宾",
+        "Philippines",
+        "PH",
+        "菲",
+        "PAGASA"
+      ]
+    },
+    {
+      "id": "ID",
+      "name": "印度尼西亚",
+      "en": "Indonesia",
+      "lat": -0.8,
+      "lon": 113.9,
+      "region": "南亚东南亚",
+      "aliases": [
+        "印尼",
+        "印度尼西亚",
+        "Indonesia",
+        "ID"
+      ]
+    },
+    {
+      "id": "AU",
+      "name": "澳大利亚",
+      "en": "Australia",
+      "lat": -25.3,
+      "lon": 133.8,
+      "region": "大洋洲",
+      "aliases": [
+        "澳大利亚",
+        "澳洲",
+        "Australia",
+        "AU",
+        "澳",
+        "AusPost",
+        "Australia Post",
+        "business.gov.au",
+        "BOM",
+        "TGA"
+      ]
+    },
+    {
+      "id": "NZ",
+      "name": "新西兰",
+      "en": "New Zealand",
+      "lat": -40.9,
+      "lon": 174.9,
+      "region": "大洋洲",
+      "aliases": [
+        "新西兰",
+        "New Zealand",
+        "NZ",
+        "纽西兰"
+      ]
+    },
+    {
+      "id": "RU",
+      "name": "俄罗斯",
+      "en": "Russia",
+      "lat": 61.5,
+      "lon": 105.3,
+      "region": "欧亚",
+      "aliases": [
+        "俄罗斯",
+        "Russia",
+        "RU"
+      ]
+    },
+    {
+      "id": "ZZ",
+      "name": "全球",
+      "en": "Global",
+      "lat": 8.0,
+      "lon": 0.0,
+      "region": "全球",
+      "aliases": [
+        "全球",
+        "世界",
+        "Global",
+        "World",
+        "全球（银发核心）",
+        "欧美",
+        "欧美高端",
+        "通用",
+        "ALL",
+        "所有国家",
+        "多国"
+      ]
+    }
+  ],
+  "product_lines": {}
 }

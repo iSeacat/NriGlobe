@@ -1,0 +1,18 @@
+{
+  "_note": "示例产品线配置（公开仓库用）。复制为 markets.local.json 并替换成你自己的产品线。",
+  "line_default_markets": {
+    "示例产品线A": [
+      "US",
+      "EU",
+      "JP"
+    ],
+    "示例产品线B": [
+      "US",
+      "AU"
+    ]
+  },
+  "product_lines": {
+    "示例产品线A": "示例产品线A / Sample Line A",
+    "示例产品线B": "示例产品线B / Sample Line B"
+  }
+}
