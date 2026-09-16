@@ -1,0 +1,1158 @@
+<!doctype html>
+<html lang="zh-CN" data-page-node-id="nwAv6j6qM9Eh5xe3AOBB1x">
+<head data-page-node-id="uvP7uIqiFtOE4NFwoQBeRX">
+<meta charset="utf-8" data-page-node-id="3zvBcfFhTTLSNhrR8IigUy">
+<meta name="viewport" content="width=device-width,initial-scale=1" data-page-node-id="fUzuRxbKgNN7ZgcK59AQF6">
+<title>NRI 跨境情报地球 · 全球信息差雷达</title>
+<style>
+  :root{
+    --bg-0:#050a14; --bg-1:#0a1729;
+    --panel:rgba(11,24,42,.78); --panel-solid:#0c1a2d;
+    --line:rgba(120,180,255,.16);
+    --text:#dbe7f7; --text-dim:#8ba3c0; --text-soft:#6d86a3;
+    --cyan:#4fd6ff; --orange:#ffb056; --red:#ff6272; --green:#43d9a3; --violet:#a98cff;
+    --shadow:0 18px 46px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:
+      radial-gradient(1500px 1000px at 50% 36%, #16314d 0%, #0a182b 52%, #050a14 100%);
+    color:var(--text); overflow:hidden;
+    font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  #stage{position:fixed;inset:0}
+  #stage canvas{display:block;touch-action:none;cursor:grab}
+  #stage canvas:active{cursor:grabbing}
+  #vignette{position:fixed;inset:0;pointer-events:none;z-index:5;
+    background:radial-gradient(ellipse at 50% 46%, rgba(0,0,0,0) 52%, rgba(2,6,14,.5) 100%);}
+  #labels{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+  .lbl{
+    position:absolute;transform:translate(-50%,-50%);
+    padding:2px 8px;border-radius:999px;white-space:nowrap;
+    font-size:12px;letter-spacing:.2px;color:#eaf4ff;
+    background:rgba(8,20,36,.62);border:1px solid rgba(120,180,255,.22);backdrop-filter:blur(2px);
+    text-shadow:0 1px 6px rgba(0,0,0,.7);display:none;
+  }
+  .lbl b{font-weight:600}
+  .lbl i{font-style:normal;color:var(--cyan);margin-left:4px;font-size:11px}
+  .lbl.sel{background:rgba(79,214,255,.16);border-color:var(--cyan);color:#fff}
+  .tip{
+    position:fixed;pointer-events:none;z-index:60;display:none;
+    padding:8px 10px;border-radius:10px;font-size:12px;line-height:1.5;
+    background:rgba(6,16,30,.94);border:1px solid var(--line);box-shadow:var(--shadow);
+  }
+  .tip b{color:#fff}
+  .tip span{color:var(--text-dim)}
+
+  /* ---------- 顶栏 ---------- */
+  #topbar{
+    position:fixed;top:0;left:0;right:0;height:62px;z-index:20;
+    display:flex;align-items:center;gap:16px;padding:0 18px;
+    background:linear-gradient(180deg,rgba(5,10,20,.92),rgba(5,10,20,0));
+    pointer-events:none;
+  }
+  #topbar > *{pointer-events:auto}
+  .brand{display:flex;align-items:baseline;gap:10px}
+  .brand h1{margin:0;font-size:18px;letter-spacing:1px;font-weight:600}
+  .brand small{color:var(--text-soft);font-size:12px}
+  .stats{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+  .stat{padding:5px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:12px;color:var(--text-dim)}
+  .stat b{color:#fff;font-size:13px;margin:0 2px}
+  .stat.c-cyan b{color:var(--cyan)} .stat.c-orange b{color:var(--orange)} .stat.c-red b{color:var(--red)}
+
+  /* ---------- 面板 ---------- */
+  .panel{
+    position:fixed;z-index:15;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow);backdrop-filter:blur(10px);
+  }
+  #left{left:18px;top:74px;width:246px;max-height:calc(100vh - 96px);overflow:auto;padding:14px}
+  #right{right:18px;top:74px;width:392px;max-height:calc(100vh - 96px);overflow:auto;padding:16px 16px 18px}
+  .grp{margin-bottom:16px}
+  .grp:last-child{margin-bottom:0}
+  .grp h3{margin:0 0 8px;font-size:12px;font-weight:600;color:var(--text-soft);letter-spacing:1px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{
+    padding:5px 10px;border-radius:9px;cursor:pointer;font-size:12px;user-select:none;
+    background:rgba(255,255,255,.045);border:1px solid var(--line);color:var(--text-dim);
+    transition:.15s;
+  }
+  .chip:hover{border-color:rgba(120,180,255,.4);color:#eaf4ff}
+  .chip.on{background:rgba(79,214,255,.14);border-color:rgba(79,214,255,.55);color:#eaf6ff}
+  .chip.on.o{background:rgba(255,176,86,.14);border-color:rgba(255,176,86,.55)}
+  .chip .n{opacity:.75;margin-left:4px;font-size:11px}
+  .seg{display:flex;gap:6px}
+  .seg .chip{flex:1;text-align:center}
+  .date-strip{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .date-strip .chip{padding:4px 7px;font-size:11px;font-variant-numeric:tabular-nums}
+  input.search{
+    width:100%;padding:7px 10px;border-radius:9px;background:rgba(255,255,255,.05);
+    border:1px solid var(--line);color:var(--text);outline:none;font-size:12px;
+  }
+  input.search:focus{border-color:rgba(79,214,255,.55)}
+  .mlist{margin-top:8px;display:flex;flex-direction:column;gap:3px;max-height:262px;overflow:auto}
+  .mrow{
+    display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;cursor:pointer;
+    font-size:12.5px;color:var(--text-dim);
+  }
+  .mrow:hover{background:rgba(255,255,255,.05);color:#eaf4ff}
+  .mrow.on{background:rgba(79,214,255,.13);color:#fff}
+  .mrow .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+  .mrow .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mrow .ct{font-size:11px;color:var(--text-soft);font-variant-numeric:tabular-nums}
+  .slider{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-soft)}
+  .slider input{flex:1;accent-color:var(--cyan)}
+
+  /* ---------- 右侧详情 ---------- */
+  #right h2{margin:0 0 2px;font-size:20px;font-weight:600;letter-spacing:.5px}
+  #right .sub{color:var(--text-soft);font-size:12px;margin-bottom:12px}
+  .sec{margin-top:14px}
+  .sec > .hd{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-soft);letter-spacing:1px;margin-bottom:8px}
+  .sec > .hd i{width:6px;height:6px;border-radius:50%;display:inline-block}
+  .card{
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+    border-left:2px solid var(--cyan);border-radius:9px;padding:9px 11px;margin-bottom:8px;
+  }
+  .card.pain{border-left-color:var(--orange)}
+  .card .t{font-size:13px;color:#f0f7ff;font-weight:600;line-height:1.45}
+  .card .m{font-size:11px;color:var(--text-soft);margin:4px 0 5px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .card .s{font-size:12px;color:#b8c9de;line-height:1.62}
+  .card .s.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .card .lk{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+  .card a{color:var(--cyan);font-size:11px;text-decoration:none;background:rgba(79,214,255,.1);
+    border:1px solid rgba(79,214,255,.25);border-radius:6px;padding:2px 6px}
+  .card a:hover{background:rgba(79,214,255,.2)}
+  .tag{padding:1px 6px;border-radius:5px;font-size:10.5px;border:1px solid transparent}
+  .tag.high{background:rgba(255,98,114,.15);color:var(--red);border-color:rgba(255,98,114,.35)}
+  .tag.mid{background:rgba(255,176,86,.14);color:var(--orange);border-color:rgba(255,176,86,.32)}
+  .tag.low{background:rgba(67,217,163,.13);color:var(--green);border-color:rgba(67,217,163,.3)}
+  .tag.line{background:rgba(169,140,255,.13);color:var(--violet);border-color:rgba(169,140,255,.3)}
+  .tag.gl{background:rgba(255,255,255,.07);color:var(--text-dim);border-color:rgba(255,255,255,.14)}
+  .empty{color:var(--text-soft);font-size:12px;padding:10px;border:1px dashed var(--line);border-radius:9px;text-align:center}
+  .bar{height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:4px}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+  .rank{display:flex;flex-direction:column;gap:7px;margin-top:2px}
+  .rank .r{display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer}
+  .rank .r:hover .rn{color:#fff}
+  .rank .rn{width:66px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rank .rb{flex:1}
+  .rank .rv{width:34px;text-align:right;color:var(--text-soft);font-variant-numeric:tabular-nums}
+  .close{float:right;cursor:pointer;color:var(--text-soft);font-size:12px;border:1px solid var(--line);
+    border-radius:7px;padding:2px 8px}
+  .close:hover{color:#fff;border-color:rgba(120,180,255,.5)}
+
+  /* ---------- 底部图例 ---------- */
+  #legend{
+    position:fixed;left:18px;bottom:16px;z-index:15;display:flex;gap:14px;align-items:center;
+    padding:9px 13px;border-radius:12px;background:var(--panel);border:1px solid var(--line);
+    font-size:11.5px;color:var(--text-dim);box-shadow:var(--shadow);backdrop-filter:blur(10px);flex-wrap:wrap;
+    max-width:calc(100vw - 36px);
+  }
+  #legend i{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+  #legend .k{color:var(--cyan)}
+  kbd{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:11px}
+  #hint{position:fixed;right:18px;bottom:16px;z-index:15;font-size:11.5px;color:var(--text-soft);
+    background:var(--panel);border:1px solid var(--line);padding:8px 12px;border-radius:12px;backdrop-filter:blur(10px)}
+  @media(max-width:1180px){
+    #right{width:330px}
+    #left{width:214px}
+  }
+  @media(max-width:900px){
+    #left,#right{display:none}
+  }
+</style>
+</head>
+<body data-page-node-id="Yo0xc3uaVcneBGW68hBqZq">
+
+<div id="stage" data-page-node-id="rCbo0poH4OVSh6pkwGGSIK"></div>
+<div id="vignette"></div>
+<div id="labels" data-page-node-id="0cmAOuVRCfxbizoFRTuInw"></div>
+<div id="tip" class="tip" data-page-node-id="zGgXg1OHFUUTq6F1uTB7FP"></div>
+
+<header id="topbar" data-page-node-id="ywT8tvFRtH0dsRHH8kH2VJ">
+  <div class="brand" data-page-node-id="WOil8kx84XfdydLfZ1vSVv">
+    <h1 data-page-node-id="HHDKi2ElUwXQBNPGhAeUS0">NRI 跨境情报地球</h1>
+    <small data-page-node-id="LrtPzIjPclk6ma5d7wDGSy">新闻 × 产品痛点 · 按国家打点 · 地球自转巡航</small>
+  </div>
+  <div class="stats" id="stats" data-page-node-id="unXPNiOphMGM56oDt2qnSt"></div>
+</header>
+
+<aside id="left" class="panel" data-page-node-id="htaUYLxipKVUuCiPaUeKC2">
+  <div class="grp" data-page-node-id="Bg7QkDeCVh8un7LNX1ffTW">
+    <h3 data-page-node-id="HDhc4uIGnTGYF1WELam6vj">时间范围</h3>
+    <div class="seg" data-page-node-id="kzfPCesHNKTIYL7h35nTBL">
+      <div class="chip" id="btn-today" data-page-node-id="cfoOPflHeNFQx3MnHNkdcq">只看今天</div>
+      <div class="chip on" id="btn-all" data-page-node-id="HAUiq5oxySwpFuqWBdgrP8">全部一起转</div>
+    </div>
+    <div class="date-strip" id="dates" data-page-node-id="2CH7brWHRjzYFxAiQeqova"></div>
+  </div>
+  <div class="grp" data-page-node-id="qlexIuOybCMoZgFDHc2TkG">
+    <h3 data-page-node-id="6gCMhTBUNbLswUbzz4XqEc">内容类型</h3>
+    <div class="chips" id="types" data-page-node-id="ZNTADUFsDVwEj6ZytEEW3V"></div>
+  </div>
+  <div class="grp" data-page-node-id="TlKaxEZqT12Eifq0ow8dDU">
+    <h3 data-page-node-id="jwlHlSSzIgzsuWAZ8Gxbnr">产品线 / 来源</h3>
+    <div class="chips" id="lines" data-page-node-id="Ujx9Al13WA21GdSJk9tN3K"></div>
+  </div>
+  <div class="grp" data-page-node-id="Eci6oVXWc81Y7scC96uN5Q">
+    <h3 data-page-node-id="Gles4MGD2MA8mHucYT6Zj2">国家与地区</h3>
+    <input class="search" id="q" placeholder="搜索国家，如：美国 / Japan" data-page-node-id="n8ev9aFHAKsKkGxOCpuFBZ">
+    <div class="mlist" id="mlist" data-page-node-id="H1KMWkfmAiyLA4y2StbHRJ"></div>
+  </div>
+  <div class="grp" data-page-node-id="RhfQEm0quYvYlNNixnN9oE">
+    <h3 data-page-node-id="2chDQslRSQVEV2Kk4UhG9v">转动控制</h3>
+    <div class="seg" data-page-node-id="QXrZMT8DHPZqoTfUU4ekj0">
+      <div class="chip on" id="btn-spin" data-page-node-id="yENYIOjbBwncXfV8QWkE2E">自转中</div>
+      <div class="chip" id="btn-cruise" data-page-node-id="Q866aHmtWs2nDKABb8gxcV">自动巡航</div>
+    </div>
+    <div class="slider" style="margin-top:9px" data-page-node-id="yH6d1LZ2rwekk2mLo6mT1n">慢<input type="range" id="speed" min="10" max="220" value="15" data-page-node-id="ZkDTgV5mAH8RZSihCDMCVl">快</div>
+    <div class="grp" style="margin:10px 0 0;font-size:11px;color:var(--text-soft);line-height:1.7" data-page-node-id="HPWT2C7wf78OYVM0ayk4sh">
+      拖拽旋转 · 滚轮缩放 · 点星点看该国详情 · 空白处取消选中
+    </div>
+  </div>
+</aside>
+
+<aside id="right" class="panel" data-page-node-id="RdEvUHnZtNOum9CAyEaLYV">
+  <div id="detail" data-page-node-id="3PwHl3QerwGhq5GJtqWMak"></div>
+</aside>
+
+<div id="legend" data-page-node-id="hlD7XAG4NeSi6o6RpK9Hmk">
+  <span data-page-node-id="Nyq9E5QIGZtQfym5SISNbD"><i style="background:var(--cyan)" data-page-node-id="hZyz5lframh6BAtBrHosT4"></i>新闻为主</span>
+  <span data-page-node-id="iV11EP4Zu2OCefGR8l7JSI"><i style="background:var(--orange)" data-page-node-id="jJ6lR5xATXWoPraBynsLSn"></i>痛点为主</span>
+  <span data-page-node-id="oJhVfhFq1AMxfZJUOSv76L"><i style="background:var(--red)" data-page-node-id="F9pfa6dixAXF8ZAJnuyx7G"></i>含高严重度痛点</span>
+  <span data-page-node-id="qm9EKnllKhNYPBN1ZLcr1F"><i style="background:transparent;border:1px solid var(--cyan)" data-page-node-id="PGxcYcEuQxsmcEvXrZgXWf"></i>空心=含全球性条目</span>
+  <span data-page-node-id="sppgRkHjC02KgZHUiFSeGx">圈越大=条目越多</span>
+  <span class="k" data-page-node-id="fdIrrC2AhGFKr3Uhdwzkhv">空格</span> 暂停/继续自转
+</div>
+<div id="hint" data-page-node-id="jE5777YsC0SnDgbPcbRkMi">
+  数据由 <b data-page-node-id="n3QiapEjaiDLfUgk1AjkhC">scripts/build.py</b> 编译 · <span id="gen" data-page-node-id="x7G7Cmva2VV1JcDdsIt96b"></span> · 源：<span id="srcs" data-page-node-id="aQgFN6fES1Hew3twvzp9At"></span>
+</div>
+
+<script src="lib/three.min.js"></script>
+<script src="data/world.js"></script>
+<script src="data/dataset.js"></script>
+<script>
+(function () {
+  "use strict";
+  if (!window.NRI_DATA || !window.WORLD_LAND) {
+    document.body.innerHTML = '<div style="padding:40px;color:#ff8">数据文件缺失：请先运行 python scripts/build.py 生成 data/dataset.js 与 data/world.js</div>';
+    return;
+  }
+  var DATA = window.NRI_DATA;
+  var LAND = window.WORLD_LAND;
+  var R = 100;
+
+  // ---------------------------------------------------------------- 状态
+  var today = DATA.dates[DATA.dates.length - 1];
+  var state = {
+    mode: "all",            // today | date | all
+    date: today,
+    types: { news: true, pain: true },
+    lines: {},              // line -> bool
+    sel: null,              // 选中的 market id
+    q: "",
+    spin: true,
+    cruise: false,
+    speed: 0.15
+  };
+  Object.keys(DATA.product_lines || {}).forEach(function (k) { state.lines[k] = true; });
+  state.lines["每日新闻"] = true;
+
+  var el = function (id) { return document.getElementById(id); };
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  // ---------------------------------------------------------------- three 基础
+  var stage = el("stage");
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 1, 4000);
+  var camDist = 330;
+  camera.position.set(0, 0, camDist);
+
+  var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  if (THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+  stage.appendChild(renderer.domElement);
+
+  // ---------------------------------------------------------------- 光照：太阳主光 + 背面冷补光
+  scene.add(new THREE.AmbientLight(0x5f88bd, 0.46));
+  var sun = new THREE.DirectionalLight(0xfff2dd, 1.18);
+  sun.position.set(-0.82, 0.46, 1.15);
+  scene.add(sun);
+  var rimLight = new THREE.DirectionalLight(0x4f8ee2, 0.55);
+  rimLight.position.set(1.1, -0.32, -0.9);
+  scene.add(rimLight);
+  var SUN_DIR = sun.position.clone().normalize();
+
+  // ---------------------------------------------------------------- 通用绘图小工具
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function makeGlowTex(mid) {
+    var s = 128, cv = document.createElement("canvas");
+    cv.width = cv.height = s;
+    var c = cv.getContext("2d");
+    var g = c.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    g.addColorStop(0, "rgba(255,255,255,1)");
+    g.addColorStop(mid, "rgba(255,255,255,0.42)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    c.fillStyle = g; c.fillRect(0, 0, s, s);
+    var t = new THREE.CanvasTexture(cv);
+    if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }
+  var glowTex = makeGlowTex(0.22);
+  function newCanvas(W, H) {
+    var cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    return cv;
+  }
+  function toTexture(cv, srgb) {
+    var t = new THREE.CanvasTexture(cv);
+    if (srgb !== false && THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return t;
+  }
+
+  // ---------------------------------------------------------------- 星空（三层 + 呼吸闪烁）
+  var starField = new THREE.Group();
+  scene.add(starField);
+  var starLayers = [];
+  (function stars() {
+    var tex = makeGlowTex(0.13);
+    [
+      { n: 1300, size: 2.0, op: 0.42, col: 0x9fc4e8, r0: 1150, r1: 2000 },
+      { n: 560, size: 3.4, op: 0.76, col: 0xe2ecff, r0: 1050, r1: 1800 },
+      { n: 150, size: 6.0, op: 0.95, col: 0xffecca, r0: 950, r1: 1650 }
+    ].forEach(function (L, li) {
+      var pos = new Float32Array(L.n * 3);
+      for (var i = 0; i < L.n; i++) {
+        var r = L.r0 + Math.random() * (L.r1 - L.r0);
+        var t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1);
+        pos[i * 3] = r * Math.sin(p) * Math.cos(t);
+        pos[i * 3 + 1] = r * Math.sin(p) * Math.sin(t);
+        pos[i * 3 + 2] = r * Math.cos(p);
+      }
+      var g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      var m = new THREE.PointsMaterial({
+        color: L.col, map: tex, size: L.size, sizeAttenuation: true,
+        transparent: true, opacity: L.op, depthWrite: false, blending: THREE.AdditiveBlending
+      });
+      var pts = new THREE.Points(g, m);
+      pts.renderOrder = -2;
+      starField.add(pts);
+      starLayers.push({ mat: m, base: L.op, ph: li * 1.9, sp: 0.45 + li * 0.28 });
+    });
+  })();
+
+  // ---------------------------------------------------------------- 地球贴图（海洋 / 陆地 / 云层）
+  function drawPaths(ctx, fn, W, H) {
+    LAND.countries.forEach(function (cty) {
+      cty.rings.forEach(function (ring) {
+        ctx.beginPath();
+        for (var i = 0; i < ring.length; i++) {
+          var px = (ring[i][0] + 180) / 360 * W;
+          var py = (90 - ring[i][1]) / 180 * H;
+          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        fn(ctx);
+      });
+    });
+  }
+
+  // 陆地：纬度生物群系渐变（冰盖→针叶林→赤道雨林）+ 地形颗粒质感
+  function buildLandCanvas(W, H) {
+    var lc = newCanvas(W, H), l = lc.getContext("2d");
+    // 基础陆地色（会被下方纬度生物群系渐变覆盖）
+    l.fillStyle = "#4f8a5b";
+    drawPaths(l, function (cc) { cc.fill(); }, W, H);
+
+    // 纬度生物群系：极地冰盖 → 针叶林 → 温带 → 赤道雨林，南/北对称
+    l.globalCompositeOperation = "source-atop";
+    var bg = l.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0.00, "#e9f1f6");
+    bg.addColorStop(0.10, "#cfe0d2");
+    bg.addColorStop(0.24, "#6fa05c");
+    bg.addColorStop(0.42, "#4f8a4f");
+    bg.addColorStop(0.50, "#3f7a48");
+    bg.addColorStop(0.58, "#4f8a4f");
+    bg.addColorStop(0.76, "#6fa05c");
+    bg.addColorStop(0.90, "#cfe0d2");
+    bg.addColorStop(1.00, "#e9f1f6");
+    l.fillStyle = bg;
+    l.fillRect(0, 0, W, H);
+
+    // 地形颗粒（只落在陆地上，制造明暗斑驳）
+    var nz = newCanvas(256, 256), nzx = nz.getContext("2d");
+    var img = nzx.createImageData(256, 256), dd = img.data;
+    var rnd = mulberry32(4242);
+    for (var i = 0; i < dd.length; i += 4) {
+      var v = rnd();
+      if (v < 0.55) { dd[i + 3] = 0; continue; }
+      var dark = v < 0.80;
+      dd[i] = dd[i + 1] = dd[i + 2] = dark ? 0 : 255;
+      dd[i + 3] = 18 + Math.random() * 26;
+    }
+    nzx.putImageData(img, 0, 0);
+    l.globalCompositeOperation = "source-atop";
+    l.fillStyle = l.createPattern(nz, "repeat");
+    l.fillRect(0, 0, W, H);
+    l.globalCompositeOperation = "source-over";
+    return lc;
+  }
+
+  function buildTexture() {
+    var W = 4096, H = 2048;
+    var cv = newCanvas(W, H), c = cv.getContext("2d");
+
+    // 海洋底色：深蓝，赤道略亮、两极近墨
+    var gsea = c.createLinearGradient(0, 0, 0, H);
+    gsea.addColorStop(0.00, "#04101f");
+    gsea.addColorStop(0.18, "#072033");
+    gsea.addColorStop(0.50, "#0a2c4d");
+    gsea.addColorStop(0.82, "#072033");
+    gsea.addColorStop(1.00, "#04101f");
+    c.fillStyle = gsea; c.fillRect(0, 0, W, H);
+
+    // 海盆起伏（随机柔光斑）
+    var rnd = mulberry32(20260914);
+    c.globalCompositeOperation = "lighter";
+    for (var b = 0; b < 320; b++) {
+      var bx = rnd() * W, by = 100 + rnd() * (H - 200), br = 90 + rnd() * 360;
+      var rg = c.createRadialGradient(bx, by, 0, bx, by, br);
+      rg.addColorStop(0, "rgba(60,140,215,0.085)");
+      rg.addColorStop(1, "rgba(60,140,215,0)");
+      c.fillStyle = rg;
+      c.beginPath(); c.arc(bx, by, br, 0, Math.PI * 2); c.fill();
+    }
+    c.globalCompositeOperation = "source-over";
+
+    // 经纬网格（极淡，仅作科技质感）
+    c.strokeStyle = "rgba(120,180,255,0.045)"; c.lineWidth = 1;
+    for (var lon = -180; lon <= 180; lon += 15) {
+      var x = (lon + 180) / 360 * W;
+      c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke();
+    }
+    for (var lat = -75; lat <= 75; lat += 15) {
+      var y = (90 - lat) / 180 * H;
+      c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke();
+    }
+
+    // 大陆架泛光：多层递减描边（柔和青蓝）
+    c.globalCompositeOperation = "lighter";
+    [[34, 0.022], [20, 0.034], [11, 0.05], [5, 0.065]].forEach(function (p) {
+      c.lineWidth = p[0];
+      c.strokeStyle = "rgba(70,150,225," + p[1] + ")";
+      drawPaths(c, function (cc) { cc.stroke(); }, W, H);
+    });
+    c.globalCompositeOperation = "source-over";
+
+    // 陆地
+    c.drawImage(buildLandCanvas(W, H), 0, 0);
+
+    // 海岸线：宽窄两道描边模拟外发光
+    c.globalCompositeOperation = "lighter";
+    c.strokeStyle = "rgba(150,215,255,0.10)"; c.lineWidth = 2.6;
+    drawPaths(c, function (cc) { cc.stroke(); }, W, H);
+    c.strokeStyle = "rgba(205,238,255,0.34)"; c.lineWidth = 0.9;
+    drawPaths(c, function (cc) { cc.stroke(); }, W, H);
+    c.globalCompositeOperation = "source-over";
+
+    return toTexture(cv, true);
+  }
+
+  // 海洋高光遮罩：白=反光（海面），黑=哑光（陆地）
+  function buildOceanMask() {
+    var W = 2048, H = 1024;
+    var cv = newCanvas(W, H), c = cv.getContext("2d");
+    c.fillStyle = "#ffffff"; c.fillRect(0, 0, W, H);
+    c.fillStyle = "#000000";
+    drawPaths(c, function (cc) { cc.fill(); }, W, H);
+    var cv2 = newCanvas(W, H), c2 = cv2.getContext("2d");
+    try { c2.filter = "blur(4px)"; } catch (e) { }
+    c2.drawImage(cv, 0, 0);
+    return toTexture(cv2, false);
+  }
+
+  // 程序化云图（value-noise fbm + 纬度云带），带 alpha 通道
+  function buildCloudTexture() {
+    var W = 1024, H = 512;
+    var cv = newCanvas(W, H), c = cv.getContext("2d");
+    var img = c.createImageData(W, H), d = img.data;
+    var rnd = mulberry32(90210);
+    var amps = [0.50, 0.26, 0.14, 0.07, 0.03], tot = 0;
+    amps.forEach(function (a) { tot += a; });
+    var octs = [4, 8, 16, 32, 64].map(function (g) {
+      var cols = g, rows = Math.max(2, g / 2), arr = new Float32Array(cols * rows);
+      for (var i = 0; i < arr.length; i++) arr[i] = rnd();
+      return { cols: cols, rows: rows, a: arr };
+    });
+    function wrapX(i, cols) { return ((i % cols) + cols) % cols; }
+    function fade(t) { return t * t * (3 - 2 * t); }
+    function samp(o, u, v) {
+      var fx = u * o.cols, fy = v * (o.rows - 1);
+      var x0 = Math.floor(fx), y0 = Math.min(o.rows - 2, Math.floor(fy));
+      var tx = fade(fx - x0), ty = fade(fy - y0);
+      var x1 = x0 + 1, y1 = Math.min(o.rows - 1, y0 + 1);
+      var c00 = o.a[y0 * o.cols + wrapX(x0, o.cols)];
+      var c10 = o.a[y0 * o.cols + wrapX(x1, o.cols)];
+      var c01 = o.a[y1 * o.cols + wrapX(x0, o.cols)];
+      var c11 = o.a[y1 * o.cols + wrapX(x1, o.cols)];
+      return (c00 * (1 - tx) + c10 * tx) * (1 - ty) + (c01 * (1 - tx) + c11 * tx) * ty;
+    }
+    for (var py = 0; py < H; py++) {
+      var v = py / (H - 1);
+      var lat = 90 - v * 180;
+      var belt = 0.46
+        + 0.40 * Math.exp(-Math.pow(lat / 12, 2))
+        + 0.34 * Math.exp(-Math.pow((Math.abs(lat) - 52) / 20, 2))
+        - 0.30 * Math.exp(-Math.pow((Math.abs(lat) - 26) / 12, 2));
+      if (belt < 0) belt = 0; else if (belt > 1) belt = 1;
+      var edge = 0.70 - belt * 0.34;
+      for (var px = 0; px < W; px++) {
+        var n = 0;
+        for (var k = 0; k < octs.length; k++) n += amps[k] * samp(octs[k], px / W, v);
+        n /= tot;
+        var t = (n - edge) / 0.13;
+        if (t < 0) t = 0; else if (t > 1) t = 1;
+        var al = t * t * (3 - 2 * t);
+        var idx = (py * W + px) * 4;
+        d[idx] = d[idx + 1] = d[idx + 2] = 255;
+        d[idx + 3] = (al * 240) | 0;
+      }
+    }
+    c.putImageData(img, 0, 0);
+    return toTexture(cv, true);
+  }
+
+  var globe = new THREE.Group();
+  scene.add(globe);
+
+  var earth = new THREE.Mesh(
+    new THREE.SphereGeometry(R, 128, 96),
+    new THREE.MeshPhongMaterial({
+      map: buildTexture(), specularMap: buildOceanMask(),
+      specular: 0x3a5d82, shininess: 18, emissive: 0x0a1622
+    })
+  );
+  globe.add(earth);
+
+  // 云层（程序化生成，独立缓慢漂移）
+  var clouds = new THREE.Mesh(
+    new THREE.SphereGeometry(R * 1.016, 96, 64),
+    new THREE.MeshPhongMaterial({
+      map: buildCloudTexture(), transparent: true, opacity: 0.44,
+      depthWrite: false, shininess: 0, specular: 0x000000
+    })
+  );
+  clouds.renderOrder = 1;
+  globe.add(clouds);
+
+  // 球面 fresnel：边缘光晕（向阳面更亮）
+  var limb = new THREE.Mesh(
+    new THREE.SphereGeometry(R * 1.002, 96, 64),
+    new THREE.ShaderMaterial({
+      uniforms: { uSun: { value: SUN_DIR } },
+      vertexShader: "varying vec3 vN; varying vec3 vP; void main(){ vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position,1.0); vP = mv.xyz; gl_Position = projectionMatrix * mv; }",
+      fragmentShader: [
+        "uniform vec3 uSun; varying vec3 vN; varying vec3 vP;",
+        "void main(){",
+        "  float f = pow(1.0 - abs(dot(normalize(vN), normalize(-vP))), 3.2);",
+        "  float lit = 0.45 + 0.55 * max(0.0, dot(normalize(vN), normalize(uSun)));",
+        "  vec3 col = mix(vec3(0.20,0.50,0.95), vec3(0.70,0.90,1.0), f);",
+        "  gl_FragColor = vec4(col, 1.0) * f * lit * 0.95;",
+        "}"
+      ].join("\n"),
+      blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
+    })
+  );
+  limb.renderOrder = 2;
+  globe.add(limb);
+
+  // 双层大气光晕
+  function makeAtmosphere(radius, power, intensity) {
+    var m = new THREE.Mesh(
+      new THREE.SphereGeometry(radius, 72, 48),
+      new THREE.ShaderMaterial({
+        uniforms: { uPow: { value: power }, uInt: { value: intensity } },
+        vertexShader: "varying vec3 vN; void main(){ vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
+        fragmentShader: [
+          "uniform float uPow; uniform float uInt; varying vec3 vN;",
+          "void main(){",
+          "  float f = pow(max(0.0, 0.72 - dot(vN, vec3(0.0,0.0,1.0))), uPow);",
+          "  gl_FragColor = vec4(0.33,0.65,1.0,1.0) * f * uInt;",
+          "}"
+        ].join("\n"),
+        blending: THREE.AdditiveBlending, side: THREE.BackSide, transparent: true, depthWrite: false
+      })
+    );
+    m.renderOrder = 1;
+    return m;
+  }
+  scene.add(makeAtmosphere(R * 1.045, 2.0, 0.95));
+  scene.add(makeAtmosphere(R * 1.13, 3.0, 0.6));
+  scene.add(makeAtmosphere(R * 1.30, 4.2, 0.28));
+
+  // ---------------------------------------------------------------- 坐标工具
+  function latLon(lat, lon, rr) {
+    var phi = (90 - lat) * Math.PI / 180;
+    var theta = (lon + 180) * Math.PI / 180;
+    return new THREE.Vector3(
+      -rr * Math.sin(phi) * Math.cos(theta),
+      rr * Math.cos(phi),
+      rr * Math.sin(phi) * Math.sin(theta)
+    );
+  }
+  function viewRotation(lat, lon) {
+    var p = latLon(lat, lon, R);
+    var ry = Math.atan2(-p.x, p.z);
+    var rx = Math.atan2(p.y, Math.hypot(p.x, p.z));
+    return { y: ry, x: Math.max(-0.85, Math.min(0.85, rx)) };
+  }
+
+  // ---------------------------------------------------------------- 标记节点
+  var beamTex = (function () {
+    var cv = newCanvas(64, 256), c = cv.getContext("2d");
+    var g = c.createLinearGradient(0, 0, 0, 256);
+    g.addColorStop(0, "rgba(255,255,255,0)");
+    g.addColorStop(0.45, "rgba(255,255,255,0.30)");
+    g.addColorStop(1, "rgba(255,255,255,0.95)");
+    c.fillStyle = g; c.fillRect(0, 0, 64, 256);
+    var t = new THREE.CanvasTexture(cv);
+    if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  })();
+  var ringTex = (function () {
+    var s = 128, cv = document.createElement("canvas");
+    cv.width = cv.height = s;
+    var c = cv.getContext("2d");
+    c.strokeStyle = "rgba(255,255,255,1)"; c.lineWidth = 5;
+    c.beginPath(); c.arc(s / 2, s / 2, s / 2 - 8, 0, Math.PI * 2); c.stroke();
+    var t = new THREE.CanvasTexture(cv);
+    if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  })();
+
+  var COL = { news: 0x4fd6ff, pain: 0xffb056, high: 0xff6272, sel: 0x8fb4ff };
+  var labelLayer = el("labels");
+  var nodes = {}, nodeList = [], hits = [];
+
+  DATA.markets.forEach(function (m) {
+    var pos = latLon(m.lat, m.lon, R * 1.006);
+    var core = new THREE.Mesh(
+      new THREE.SphereGeometry(1.7, 16, 12),
+      new THREE.MeshBasicMaterial({ color: COL.news })
+    );
+    core.position.copy(pos);
+    core.renderOrder = 5;
+    var halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: COL.news, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+    halo.position.copy(pos);
+    halo.renderOrder = 5;
+    var ring = new THREE.Sprite(new THREE.SpriteMaterial({ map: ringTex, color: 0xffffff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.9 }));
+    ring.position.copy(pos);
+    ring.renderOrder = 6;
+    ring.visible = false;
+    var hit = new THREE.Mesh(
+      new THREE.SphereGeometry(4.4, 12, 10),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+    );
+    hit.position.copy(pos);
+    hit.userData.mid = m.id;
+    globe.add(core); globe.add(halo); globe.add(ring); globe.add(hit);
+    hits.push(hit);
+
+    // 表面雷达涟漪（两层错相位）
+    var ripples = [];
+    for (var ri = 0; ri < 2; ri++) {
+      var rp = new THREE.Mesh(
+        new THREE.CircleGeometry(1, 44),
+        new THREE.MeshBasicMaterial({
+          map: ringTex, color: COL.news, transparent: true, side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0
+        })
+      );
+      rp.position.copy(pos);
+      rp.lookAt(pos.clone().multiplyScalar(2));
+      rp.renderOrder = 4;
+      rp.visible = false;
+      globe.add(rp);
+      ripples.push(rp);
+    }
+
+    // 竖直光柱（高度随条目数增长）
+    var dir = pos.clone().normalize();
+    var beam = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.5, 1.9, 1, 12, 1, true),
+      new THREE.MeshBasicMaterial({
+        map: beamTex, color: COL.news, transparent: true, side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0
+      })
+    );
+    beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+    beam.renderOrder = 4;
+    beam.visible = false;
+    globe.add(beam);
+
+    var lb = document.createElement("div");
+    lb.className = "lbl";
+    labelLayer.appendChild(lb);
+
+    var n = {
+      m: m, pos: pos, dir: dir, core: core, halo: halo, ring: ring, hit: hit, label: lb,
+      ripples: ripples, beam: beam, phase: Math.random(),
+      items: [], news: 0, pain: 0, high: 0, glob: 0, count: 0,
+      scale: 0, target: 0, hasGlobalRing: false
+    };
+    nodes[m.id] = n; nodeList.push(n);
+  });
+
+  // ---------------------------------------------------------------- 过滤与聚合
+  function activeDate() {
+    return state.mode === "today" ? today : (state.mode === "date" ? state.date : null);
+  }
+  function matches(it) {
+    if (!state.types[it.type]) return false;
+    if (!state.lines[it.line]) return false;
+    var d = activeDate();
+    return d === null || it.dates.indexOf(d) >= 0;
+  }
+  function rebuild() {
+    nodeList.forEach(function (n) {
+      n.items = []; n.news = 0; n.pain = 0; n.high = 0; n.glob = 0; n.count = 0;
+    });
+    var total = 0, used = 0, highN = 0, newsN = 0, painN = 0;
+    DATA.items.forEach(function (it) {
+      if (!matches(it)) return;
+      total++;
+      if (it.type === "news") newsN++; else painN++;
+      if (it.severity === "high") highN++;
+      it.markets.forEach(function (mid) {
+        var n = nodes[mid];
+        if (!n) return;
+        n.items.push(it); n.count++;
+        if (it.type === "news") n.news++; else n.pain++;
+        if (it.severity === "high") n.high++;
+        if (it.global) n.glob++;
+      });
+    });
+    nodeList.forEach(function (n) {
+      n.target = n.count > 0 ? 1 : 0;
+      used += n.count > 0 ? 1 : 0;
+      var col;
+      if (n.high > 0) col = COL.high;
+      else if (n.pain > n.news) col = COL.pain;
+      else col = COL.news;
+      n.baseCol = col;
+      var isSel = (state.sel === n.m.id);
+      var useCol = isSel ? COL.sel : col;   // 选中改用柔和蓝紫，不再用红色放大
+      n.core.material.color.setHex(useCol);
+      n.halo.material.color.setHex(useCol);
+      n.halo.material.opacity = isSel ? 0.9 : 0.7;
+      for (var ri = 0; ri < n.ripples.length; ri++) n.ripples[ri].material.color.setHex(useCol);
+      n.beam.material.color.setHex(useCol);
+    });
+    return { total: total, used: used, high: highN, news: newsN, pain: painN };
+  }
+
+  // ---------------------------------------------------------------- UI 渲染
+  function renderStats(st) {
+    var d = activeDate();
+    var when = d ? d : ("全部 " + DATA.dates.length + " 天");
+    el("stats").innerHTML =
+      '<div class="stat">时间 <b>' + esc(when) + '</b></div>' +
+      '<div class="stat c-cyan">新闻 <b>' + st.news + '</b> 条</div>' +
+      '<div class="stat c-orange">痛点 <b>' + st.pain + '</b> 条</div>' +
+      '<div class="stat c-red">高严重度 <b>' + st.high + '</b> 条</div>' +
+      '<div class="stat">覆盖 <b>' + st.used + '</b> 国 / 地区</div>';
+  }
+
+  function renderControls() {
+    // 时间
+    el("btn-today").className = "chip" + (state.mode === "today" ? " on" : "");
+    el("btn-all").className = "chip" + (state.mode === "all" ? " on" : "");
+    el("dates").innerHTML = DATA.dates.slice().reverse().map(function (d) {
+      var on = state.mode === "date" && state.date === d;
+      return '<div class="chip' + (on ? " on" : "") + '" data-d="' + d + '">' + d.slice(5) + '</div>';
+    }).join("");
+    Array.prototype.forEach.call(el("dates").children, function (c) {
+      c.onclick = function () {
+        state.date = c.getAttribute("data-d");
+        state.mode = "date";
+        refresh();
+      };
+    });
+
+    // 类型
+    var tc = [{ k: "news", n: "新闻" }, { k: "pain", n: "产品痛点" }];
+    el("types").innerHTML = tc.map(function (t) {
+      var cnt = DATA.items.filter(function (i) { return i.type === t.k && matchesIgnoreType(i); }).length;
+      return '<div class="chip' + (state.types[t.k] ? " on" : "") + (t.k === "pain" ? " o" : "") + '" data-t="' + t.k + '">' +
+        t.n + '<span class="n">' + cnt + '</span></div>';
+    }).join("");
+    Array.prototype.forEach.call(el("types").children, function (c) {
+      c.onclick = function () {
+        var k = c.getAttribute("data-t");
+        state.types[k] = !state.types[k];
+        if (!state.types.news && !state.types.pain) state.types[k] = true; // 至少保留一个维度
+        refresh();
+      };
+    });
+
+    // 产品线
+    var lines = Object.keys(state.lines);
+    el("lines").innerHTML = lines.map(function (l) {
+      var cnt = DATA.items.filter(function (i) { return i.line === l && (activeDate() === null || i.dates.indexOf(activeDate()) >= 0); }).length;
+      var nm = (DATA.product_lines && DATA.product_lines[l]) ? DATA.product_lines[l] : l;
+      return '<div class="chip' + (state.lines[l] ? " on" : "") + '" data-l="' + esc(l) + '">' + esc(nm) + '<span class="n">' + cnt + '</span></div>';
+    }).join("");
+    Array.prototype.forEach.call(el("lines").children, function (c) {
+      c.onclick = function () {
+        var l = c.getAttribute("data-l");
+        var another = Object.keys(state.lines).some(function (k) { return k !== l && state.lines[k]; });
+        state.lines[l] = !state.lines[l];
+        if (!another && !state.lines[l]) { Object.keys(state.lines).forEach(function (k) { state.lines[k] = true; }); }
+        refresh();
+      };
+    });
+
+    // 国家列表
+    var q = state.q.trim().toLowerCase();
+    var rows = nodeList.filter(function (n) {
+      if (n.count === 0) return false;
+      if (!q) return true;
+      return n.m.name.indexOf(state.q.trim()) >= 0 || n.m.en.toLowerCase().indexOf(q) >= 0 || n.m.id.toLowerCase().indexOf(q) >= 0;
+    }).sort(function (a, b) {
+      return b.count - a.count || b.high - a.high;
+    });
+    el("mlist").innerHTML = rows.length ? rows.map(function (n) {
+      var col = n.high > 0 ? "#ff6272" : (n.pain > n.news ? "#ffb056" : "#4fd6ff");
+      return '<div class="mrow' + (state.sel === n.m.id ? " on" : "") + '" data-m="' + n.m.id + '">' +
+        '<span class="dot" style="background:' + col + '"></span>' +
+        '<span class="nm">' + esc(n.m.name) + '</span>' +
+        '<span class="ct">' + n.count + '</span></div>';
+    }).join("") : '<div class="empty">当前筛选下没有国家</div>';
+    Array.prototype.forEach.call(el("mlist").querySelectorAll(".mrow"), function (c) {
+      c.onclick = function () { select(c.getAttribute("data-m"), true); };
+    });
+  }
+  function matchesIgnoreType(it) {
+    if (!state.lines[it.line]) return false;
+    var d = activeDate();
+    return d === null || it.dates.indexOf(d) >= 0;
+  }
+
+  function sevTag(s) {
+    if (s === "high") return '<span class="tag high">🔴 高</span>';
+    if (s === "mid") return '<span class="tag mid">🟡 中</span>';
+    if (s === "low") return '<span class="tag low">🟢 低</span>';
+    return "";
+  }
+
+  function itemCard(it) {
+    var meta = [];
+    meta.push('<span class="tag line">' + esc((DATA.product_lines && DATA.product_lines[it.line]) ? DATA.product_lines[it.line] : it.line) + '</span>');
+    if (it.severity && it.severity !== "unknown") meta.push(sevTag(it.severity));
+    if (it.global) meta.push('<span class="tag gl">全球性</span>');
+    meta.push(esc(it.dates[it.dates.length - 1]));
+    var links = (it.links || []).slice(0, 3).map(function (l) {
+      return '<a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.name.slice(0, 34)) + '</a>';
+    }).join("");
+    return '<div class="card' + (it.type === "pain" ? " pain" : "") + '">' +
+      '<div class="t">' + esc(it.title) + '</div>' +
+      '<div class="m">' + meta.join("") + '</div>' +
+      (it.summary ? '<div class="s clamp">' + esc(it.summary) + '</div>' : "") +
+      (links ? '<div class="lk">' + links + '</div>' : "") +
+      '</div>';
+  }
+
+  function renderDetail() {
+    var box = el("detail");
+    if (state.sel && nodes[state.sel]) {
+      var n = nodes[state.sel];
+      var news = n.items.filter(function (i) { return i.type === "news"; });
+      var pain = n.items.filter(function (i) { return i.type !== "news"; }).sort(function (a, b) {
+        var r = { high: 3, mid: 2, low: 1, unknown: 0 };
+        return r[b.severity] - r[a.severity];
+      });
+      box.innerHTML =
+        '<span class="close" id="btn-clear">清除选中</span>' +
+        '<h2>' + esc(n.m.name) + '</h2>' +
+        '<div class="sub">' + esc(n.m.en) + ' · ' + esc(n.m.region) + ' · ' + n.m.lat.toFixed(1) + '°, ' + n.m.lon.toFixed(1) + '° · 共 ' + n.count + ' 条</div>' +
+        '<div class="sec"><div class="hd"><i style="background:#4fd6ff"></i>新闻 · ' + news.length + ' 条</div>' +
+        (news.length ? news.map(itemCard).join("") : '<div class="empty">当前筛选下无新闻</div>') + '</div>' +
+        '<div class="sec"><div class="hd"><i style="background:#ffb056"></i>产品痛点 · ' + pain.length + ' 条</div>' +
+        (pain.length ? pain.map(itemCard).join("") : '<div class="empty">当前筛选下无痛点</div>') + '</div>';
+      var bc = el("btn-clear");
+      if (bc) bc.onclick = function () { select(null, false); };
+      return;
+    }
+    // 全球概览
+    var st = rebuild();
+    var top = nodeList.filter(function (n) { return n.count > 0; }).sort(function (a, b) { return b.count - a.count; }).slice(0, 9);
+    var max = top.length ? top[0].count : 1;
+    var latestNews = DATA.items.filter(function (i) { return i.type === "news" && matches(i); });
+    box.innerHTML =
+      '<h2>全球概览</h2>' +
+      '<div class="sub">' + (activeDate() ? activeDate() : ("全部 " + DATA.dates.length + " 天") ) + ' · 点击地球上的星点或左侧国家，查看该国新闻与痛点</div>' +
+      '<div class="sec"><div class="hd"><i style="background:#a98cff"></i>条目最多的市场</div><div class="rank">' +
+      top.map(function (n) {
+        return '<div class="r" data-m="' + n.m.id + '"><span class="rn">' + esc(n.m.name) + '</span>' +
+          '<span class="rb"><span class="bar"><i style="width:' + Math.round(n.count / max * 100) + '%"></i></span></span>' +
+          '<span class="rv">' + n.count + '</span></div>';
+      }).join("") + '</div></div>' +
+      '<div class="sec"><div class="hd"><i style="background:#4fd6ff"></i>新闻速览 · ' + latestNews.length + ' 条</div>' +
+      (latestNews.length ? latestNews.slice(0, 8).map(itemCard).join("") : '<div class="empty">当前筛选下无新闻</div>') + '</div>';
+    Array.prototype.forEach.call(box.querySelectorAll(".r"), function (c) {
+      c.onclick = function () { select(c.getAttribute("data-m"), true); };
+    });
+  }
+
+  function refresh() {
+    var st = rebuild();
+    renderStats(st);
+    renderControls();
+    renderDetail();
+    nodeList.forEach(function (n) {
+      n.ring.visible = false;
+      n.label.className = "lbl";
+    });
+    if (state.sel && nodes[state.sel]) {
+      // 选中：用一圈静态柔光环做提示（不闪），配合标签高亮
+      var sn = nodes[state.sel];
+      sn.ring.visible = true;
+      sn.ring.material.color.setHex(COL.sel);
+      sn.ring.material.opacity = 0.9;
+      sn.label.className = "lbl sel";
+    }
+  }
+
+  // ---------------------------------------------------------------- 旋转 / 交互
+  var rotY = 0, rotX = 0.18, targetY = 0, targetX = 0.18, flying = false;
+  (function initView() {
+    var v = viewRotation(22, 100);
+    rotY = v.y; targetY = v.y; rotX = targetX = v.x;
+  })();
+
+  function applySelColors() {
+    nodeList.forEach(function (n) {
+      var isSel = (state.sel === n.m.id && n.baseCol);
+      var hex = isSel ? COL.sel : (n.baseCol || COL.news);
+      n.core.material.color.setHex(hex);
+      n.halo.material.color.setHex(hex);
+      n.halo.material.opacity = isSel ? 0.9 : 0.7;
+      for (var ri = 0; ri < n.ripples.length; ri++) n.ripples[ri].material.color.setHex(hex);
+      n.beam.material.color.setHex(hex);
+    });
+  }
+
+  function select(mid, fly, auto) {
+    state.sel = mid;
+    if (mid && !auto) setSpin(false);   // 选中即暂停自转，方便阅读新闻
+    if (mid && !auto && nodes[mid]) nodes[mid].flashT = performance.now();  // 仅手动选中闪一次
+    applySelColors();
+    if (mid && nodes[mid] && fly) {
+      var v = viewRotation(nodes[mid].m.lat, nodes[mid].m.lon);
+      var two = Math.PI * 2;
+      var k = Math.round((rotY - v.y) / two);
+      targetY = v.y + k * two;
+      targetX = Math.max(-0.85, Math.min(0.85, v.x));
+      flying = true;
+    }
+    refresh();
+  }
+
+  var drag = null, moved = 0;
+  var dom = renderer.domElement;
+  dom.addEventListener("pointerdown", function (e) {
+    drag = { x: e.clientX, y: e.clientY, ry: rotY, rx: rotX };
+    moved = 0; flying = false;
+    dom.setPointerCapture(e.pointerId);
+  });
+  dom.addEventListener("pointermove", function (e) {
+    if (drag) {
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
+      rotY = drag.ry + dx * 0.005;
+      rotX = Math.max(-0.9, Math.min(0.9, drag.rx + dy * 0.004));
+      targetY = rotY; targetX = rotX;
+      hideTip();
+      return;
+    }
+    hoverPick(e);
+  });
+  dom.addEventListener("pointerup", function (e) {
+    if (drag && moved < 5) clickPick(e);
+    drag = null;
+  });
+  dom.addEventListener("pointerleave", function () { drag = null; hideTip(); });
+  dom.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    camDist = Math.max(165, Math.min(620, camDist + e.deltaY * 0.25));
+  }, { passive: false });
+  window.addEventListener("keydown", function (e) {
+    if (e.code === "Space") { e.preventDefault(); toggleSpin(); }
+  });
+
+  var ray = new THREE.Raycaster(), pointer = new THREE.Vector2();
+  function pick(e) {
+    pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    ray.setFromCamera(pointer, camera);
+    var list = hits.filter(function (h) { return nodes[h.userData.mid].count > 0; });
+    var hit = ray.intersectObjects(list, false);
+    return hit.length ? hit[0].object.userData.mid : null;
+  }
+  function clickPick(e) {
+    var mid = pick(e);
+    select(mid, !!mid);
+  }
+  var tip = el("tip");
+  function hoverPick(e) {
+    var mid = pick(e);
+    if (!mid) { hideTip(); return; }
+    var n = nodes[mid];
+    tip.style.display = "block";
+    tip.style.left = Math.min(window.innerWidth - 220, e.clientX + 14) + "px";
+    tip.style.top = Math.min(window.innerHeight - 90, e.clientY + 14) + "px";
+    tip.innerHTML = '<b>' + esc(n.m.name) + '</b> <span>' + esc(n.m.en) + '</span><br>' +
+      '<span>新闻 ' + n.news + ' 条 · 痛点 ' + n.pain + ' 条' + (n.high ? ' · 高严重度 ' + n.high : '') + '</span>';
+  }
+  function hideTip() { tip.style.display = "none"; }
+
+  function setSpin(v) {
+    state.spin = v;
+    var b = el("btn-spin");
+    b.className = "chip" + (v ? " on" : "");
+    b.textContent = v ? "自转中" : "已暂停";
+  }
+  function toggleSpin() { setSpin(!state.spin); }
+  el("btn-spin").onclick = toggleSpin;
+  el("btn-cruise").onclick = function () {
+    state.cruise = !state.cruise;
+    this.className = "chip" + (state.cruise ? " on" : "");
+    if (state.cruise && !state.spin) toggleSpin();
+  };
+  el("speed").oninput = function () { state.speed = parseInt(this.value, 10) / 100; };  // 0.10 ~ 2.20 rad/s（约 63~3 秒/圈）
+  state.speed = 0.15;  // 默认较慢：约 42 秒转一圈
+  el("btn-today").onclick = function () { state.mode = "today"; refresh(); };
+  el("btn-all").onclick = function () { state.mode = "all"; refresh(); };
+  el("q").oninput = function () { state.q = this.value; renderControls(); };
+
+  window.addEventListener("resize", function () {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // ---------------------------------------------------------------- 主循环
+  var tmpV = new THREE.Vector3(), tmpN = new THREE.Vector3(), tmpC = new THREE.Vector3();
+  var last = performance.now(), cruiseT = 0, cruiseI = 0;
+  function loop(now) {
+    var dt = Math.min(0.05, (now - last) / 1000); last = now;
+
+    if (flying) {
+      rotY += (targetY - rotY) * 0.09;
+      rotX += (targetX - rotX) * 0.09;
+      if (Math.abs(targetY - rotY) < 0.002 && Math.abs(targetX - rotX) < 0.002) flying = false;
+    } else if (state.spin && !drag) {
+      rotY += state.speed * dt;          // state.speed 单位：弧度/秒
+    }
+    globe.rotation.y = rotY;
+    globe.rotation.x = rotX;
+    camera.position.z = camDist;
+    camera.lookAt(0, 0, 0);
+
+    // 自动巡航
+    if (state.cruise && state.spin && !flying && !drag) {
+      cruiseT += dt;
+      if (cruiseT > 7) {
+        cruiseT = 0;
+        var hot = nodeList.filter(function (n) { return n.count > 0; });
+        if (hot.length) {
+          cruiseI = (cruiseI + 1) % hot.length;
+          select(hot[cruiseI].m.id, true, true);
+        }
+      }
+    }
+
+    // 标记缩放 + 标签
+    for (var i = 0; i < nodeList.length; i++) {
+      var n = nodeList[i];
+      n.scale += (n.target - n.scale) * 0.12;
+      var vis = n.scale > 0.03;
+      n.core.visible = vis; n.halo.visible = vis; n.hit.visible = vis;
+      if (!vis) {
+        n.label.style.display = "none";
+        n.beam.visible = false;
+        for (var rj = 0; rj < n.ripples.length; rj++) n.ripples[rj].visible = false;
+        continue;
+      }
+      var base = 5.5 + Math.min(16, n.count * 0.55);
+      n.core.scale.setScalar(n.scale * (n.count > 6 ? 1.5 : 1.25));
+      n.halo.scale.set((base + 5) * n.scale, (base + 5) * n.scale, 1);   // 静态柔光，不闪烁
+      n.ring.scale.set(base + 9, base + 9, 1);                            // 仅选中可见（refresh 控制）
+
+      // 选中后只闪一次涟漪，之后收起，避免一直闪
+      var ft = n.flashT ? (now - n.flashT) / 1100 : 99;
+      if (ft >= 0 && ft <= 1) {
+        for (var ri = 0; ri < n.ripples.length; ri++) {
+          var rp = n.ripples[ri];
+          var lt = ft - ri * 0.4;
+          if (lt < 0 || lt > 1) { rp.visible = false; continue; }
+          var rs = (4 + lt * 26) * (0.7 + Math.min(1.2, n.count * 0.1));
+          rp.scale.set(rs, rs, 1);
+          rp.material.opacity = (1 - lt) * 0.5 * n.scale;
+          rp.visible = true;
+        }
+      } else {
+        for (var rk = 0; rk < n.ripples.length; rk++) n.ripples[rk].visible = false;
+      }
+
+      // 竖直光柱（静态，不闪烁）
+      var bh = 9 + Math.min(30, n.count * 1.6);
+      n.beam.visible = true;
+      n.beam.scale.set(1, bh, 1);
+      n.beam.position.copy(n.dir).multiplyScalar(R + bh / 2);
+      n.beam.material.opacity = (state.sel === n.m.id ? 0.5 : 0.3) * n.scale;
+
+      tmpV.copy(n.pos).applyMatrix4(globe.matrixWorld);
+      tmpN.copy(tmpV).normalize();
+      tmpC.copy(camera.position).sub(tmpV);
+      var front = tmpN.dot(tmpC) > 0;
+      if (!front) { n.label.style.display = "none"; continue; }
+      var p = tmpV.clone().project(camera);
+      var x = (p.x * 0.5 + 0.5) * window.innerWidth;
+      var y = (-p.y * 0.5 + 0.5) * window.innerHeight;
+      n.label.style.display = "block";
+      n.label.style.left = x + "px";
+      n.label.style.top = (y - 16) + "px";
+      n.label.innerHTML = '<b>' + esc(n.m.name) + '</b><i>' + n.count + '</i>';
+    }
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  }
+
+  // ---------------------------------------------------------------- 启动
+  el("gen").textContent = DATA.generated_at;
+  el("srcs").textContent = (DATA.sources.news + " · " + DATA.sources.social).replace(/\\/g, "/");
+  refresh();
+  requestAnimationFrame(loop);
+  // 调试钩子（无副作用，供无头验证/自动化测试用）
+  window.NRI_DEBUG = { select: select, refresh: refresh, state: state, nodes: nodes, DATA: DATA };
+})();
+</script>
+</body>
+</html>

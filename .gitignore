@@ -1,0 +1,19 @@
+# ===== 本机私有配置（含内网共享盘路径，禁止提交）=====
+config.local.json
+
+# ===== 真实情报数据（build.py 生成，含每日真实新闻/痛点，私有）=====
+data/dataset.js
+
+# ===== 运行 / 服务日志 =====
+logs/
+lan_server.log
+
+# ===== WorkBuddy 项目记忆（内部，勿提交）=====
+.workbuddy/
+
+# ===== 截图等媒体（可能含真实数据，按需决定是否公开）=====
+media/
+
+# ===== Python 缓存 =====
+__pycache__/
+*.pyc

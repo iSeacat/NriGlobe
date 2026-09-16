@@ -1,0 +1,20 @@
+{
+  "_说明": "每日自动化闸口配置：只有在中国时间免费窗口内，才允许抓新闻 / 抓社媒。不在窗口内直接停止抓取。",
+  "free_window": {
+    "enabled": true,
+    "timezone": "Asia/Shanghai",
+    "start": "00:00",
+    "end": "09:00",
+    "note": "AI 模型 preview 免费（夜间/低峰）窗口；07:00 每日更新落在这个区间内。若 AI 模型 调整免费时段，改 start/end 即可，不用改自动化。"
+  },
+  "job": {
+    "target_hour_shanghai": 7,
+    "max_wait_minutes": 150,
+    "note": "调度落在本地时区（UTC-6，夏令时会漂移 1 小时）；自动化会先对齐到中国时间 07:00，最多等待 max_wait_minutes 分钟。"
+  },
+  "stop_conditions": [
+    "当前时间不在 free_window 内",
+    "任何工具返回需要付费 / 额度用尽 / 限流提示",
+    "连续 2 次搜索 0 命中（省流量，提前收工）"
+  ]
+}
