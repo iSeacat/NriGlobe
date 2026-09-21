@@ -30,9 +30,13 @@ data/                    ← 前端消费，禁止手改（由脚本生成）
 lib/three.min.js         ← 离线 three.js（来自 threejs.org，MIT）
 scripts/build.py         ← 解析 每日新闻/*.md + 每日社媒/*.html → data/dataset.js
 scripts/build_world.py   ← TopoJSON → 极简陆地数据
+scripts/gen_social_daily_example.py ← 社媒日报生成模板（中性示例，演示 build.py 的输入结构）
 tools/make_debug.py      ← 生成无头验证调试页
 index.html               ← 地球前端（three.js，无其它在线依赖）
 ```
+
+> 注：本机真实在跑的每日日报生成脚本（含真实产品线名与真实情报）**不进仓库**，已由 `.gitignore` 的
+> `scripts/gen_social_daily_*.py` 规则挡住；公开仓库里只保留中性的 `gen_social_daily_example.py` 模板。
 
 ## 配置（路径外置 / 自托管）
 
@@ -133,6 +137,17 @@ msedge --headless=new --use-gl=angle --use-angle=swiftshader \
   > 注意：os-taxonomy 自身的数据与内容采用 **ODbL-1.0 + CC BY-SA-4.0**（含 share-alike）。本仓库**不包含**它的任何数据或页面代码，只借鉴工程组织方式；本仓库代码以 MIT 发布。
 - **Three.js**（`lib/three.min.js`）：MIT，© Three.js Authors，来源 https://threejs.org/
 - **地理数据**（`content/countries-110m.json`、`data/world.js`）：world-atlas / Natural Earth，公有领域。
+
+## 打包分发（开源导出）
+
+要产出一个**可直接对外分发**的干净包，请不要直接压缩工作目录（里面可能有 `data/dataset.js`、
+`config.local.json`、`media/`、`logs/` 等私有物），而是从 git 导出已跟踪文件：
+
+```bash
+python scripts/export_public.py            # 导出到 dist/ 并打 zip
+```
+
+导出的包只含仓库里已提交的公开文件（示例数据 + 代码 + 离线依赖），不含任何真实情报。
 
 ## 许可
 

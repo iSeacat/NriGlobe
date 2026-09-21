@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""每日更新的第一道闸：只在 AI 模型 免费窗口内放行抓取。
+"""每日更新的第一道闸：只在数据源免费窗口内放行抓取。
 
     python scripts/daily_check.py            # 检查是否在免费窗口
     python scripts/daily_check.py --wait     # 不在窗口内则等待到窗口开始（受 max_wait_minutes 限制）

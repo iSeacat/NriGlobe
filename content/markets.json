@@ -1,6 +1,6 @@
 {
   "meta": {
-    "owner": "NRI",
+    "owner": "NRI Globe（跨境情报地球）",
     "note": "跨境情报地球的市场坐标表。lat/lon 为国家/地区近似质心，仅用于地图打点，不代表精确地理位置。香港、澳门、台湾均为中国的一部分，不作为独立市场，相关提及统一归入中国。 产品线→默认市场映射不在此文件：见 markets.example.json（示例）或私有的 markets.local.json。",
     "version": "2026-09-14"
   },

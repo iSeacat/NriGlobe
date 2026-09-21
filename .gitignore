@@ -4,6 +4,11 @@ config.local.json
 # ===== 私有产品线配置（真实品类→默认市场，私有）=====
 content/markets.local.json
 
+# ===== 每日日报生成脚本（含真实产品线与真实情报，私有）=====
+# 模板见 scripts/gen_social_daily_example.py
+scripts/gen_social_daily_*.py
+!scripts/gen_social_daily_example.py
+
 # ===== 真实情报数据（build.py 生成，含每日真实新闻/痛点，私有）=====
 data/dataset.js
 
@@ -24,3 +29,6 @@ media/
 # ===== Python 缓存 =====
 __pycache__/
 *.pyc
+
+# ===== 对外导出的发布包（由 scripts/export_public.py 产出）=====
+dist/

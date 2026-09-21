@@ -5,7 +5,7 @@
     "timezone": "Asia/Shanghai",
     "start": "00:00",
     "end": "09:00",
-    "note": "AI 模型 preview 免费（夜间/低峰）窗口；07:00 每日更新落在这个区间内。若 AI 模型 调整免费时段，改 start/end 即可，不用改自动化。"
+    "note": "数据源免费（夜间/低峰）窗口；07:00 每日更新落在这个区间内。若数据源调整免费时段，改 start/end 即可，不用改自动化。"
   },
   "job": {
     "target_hour_shanghai": 7,
