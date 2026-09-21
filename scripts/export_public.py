@@ -108,10 +108,13 @@ def add_demo_dataset(zip_bytes: bytes, prefix: str) -> bytes:
     """往导出包里补一份 data/dataset.js = 示例数据，让解压后 index.html 直接能看。
 
     仓库里的 data/dataset.js 是私有真实情报（已 gitignore），对外包里放的是
-    dataset.example.js 的副本，纯演示数据。
+    dataset.example.js 的副本，纯演示数据。副本直接取自归档，保证与包内
+    dataset.example.js 逐字节一致。
     """
-    example = git("show", "HEAD:data/dataset.example.js")
     src = zipfile.ZipFile(io.BytesIO(zip_bytes))
+    src_name = f"{prefix}data/dataset.example.js"
+    example = src.read(src_name)
+
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as dst:
         for info in src.infolist():
