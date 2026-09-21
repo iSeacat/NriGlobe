@@ -37,6 +37,9 @@ FORBIDDEN = [
 # 大体积二进制/数据文件跳过正文扫描（它们不可能含中文情报内容）
 SKIP_SCAN_SUFFIX = (".png", ".jpg", ".jpeg", ".ico", ".woff", ".woff2", ".ttf")
 
+# 扫描器自身含关键词表，跳过（自引用）
+SKIP_SCAN_FILES = {"scripts/export_public.py"}
+
 # 白名单：这些文件里的这些串属正当署名（MIT 要求写明著作权人），不算泄露。
 # 若不想公开公司名，把 LICENSE 第 3 行改成个人/中性名义，然后把下面这行清空即可。
 ALLOWED: dict[str, set[str]] = {
@@ -55,6 +58,10 @@ def scan(zip_bytes: bytes) -> list[tuple[str, int, str]]:
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         for info in zf.infolist():
             if info.is_dir() or info.filename.lower().endswith(SKIP_SCAN_SUFFIX):
+                continue
+            # 去掉 zip 里的顶层目录前缀，得到仓库内相对路径
+            rel = info.filename.split("/", 1)[-1] if "/" in info.filename else info.filename
+            if rel in SKIP_SCAN_FILES:
                 continue
             base = info.filename.rsplit("/", 1)[-1]
             allowed = ALLOWED.get(base, set())
