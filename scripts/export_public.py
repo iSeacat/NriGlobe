@@ -37,6 +37,12 @@ FORBIDDEN = [
 # 大体积二进制/数据文件跳过正文扫描（它们不可能含中文情报内容）
 SKIP_SCAN_SUFFIX = (".png", ".jpg", ".jpeg", ".ico", ".woff", ".woff2", ".ttf")
 
+# 白名单：这些文件里的这些串属正当署名（MIT 要求写明著作权人），不算泄露。
+# 若不想公开公司名，把 LICENSE 第 3 行改成个人/中性名义，然后把下面这行清空即可。
+ALLOWED: dict[str, set[str]] = {
+    "LICENSE": {"佛山", "海猫"},
+}
+
 
 def git(*args: str) -> bytes:
     return subprocess.run(["git", *args], cwd=ROOT, check=True,
@@ -50,6 +56,8 @@ def scan(zip_bytes: bytes) -> list[tuple[str, int, str]]:
         for info in zf.infolist():
             if info.is_dir() or info.filename.lower().endswith(SKIP_SCAN_SUFFIX):
                 continue
+            base = info.filename.rsplit("/", 1)[-1]
+            allowed = ALLOWED.get(base, set())
             raw = zf.read(info)
             try:
                 text = raw.decode("utf-8")
@@ -57,7 +65,7 @@ def scan(zip_bytes: bytes) -> list[tuple[str, int, str]]:
                 continue
             for i, line in enumerate(text.splitlines(), 1):
                 for token in FORBIDDEN:
-                    if token in line:
+                    if token in line and token not in allowed:
                         hits.append((info.filename, i, token))
     return hits
 
