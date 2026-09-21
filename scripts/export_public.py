@@ -19,6 +19,8 @@ from __future__ import annotations
 
 import argparse
 import io
+import json
+import os
 import subprocess
 import sys
 import zipfile
@@ -27,12 +29,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# 禁止出现在公开包里的串（内部产品线名、内部工具名、公司名、内网地址）
-FORBIDDEN = [
-    "示例产品线A", "示例产品线B", "示例产品线C", "海猫", "佛山",
-    "AI 模型", "部署服务器",
-    "内网地址", "VPN地址", "共享盘",
-]
+# 禁止出现在公开包里的串（内部产品线名、内部工具名、公司名、内网地址）。
+#
+# 注意：本文件本身会随公开包一起分发，所以**不能把真实产品线名写在这里**。
+# 真实黑名单放在私有的 config.local.json（已 gitignore）：
+#   { "export_blocklist": ["你的产品线名", "内部工具名", "内网网段"], 
+#     "export_allow":     { "LICENSE": ["公司名"] } }
+# 也可用环境变量 NRI_EXPORT_BLOCKLIST（逗号分隔）临时覆盖。
+#
+# 未配置黑名单时只做结构性检查，并会明确提示。
+DEFAULT_BLOCKLIST: list[str] = []
 
 # 大体积二进制/数据文件跳过正文扫描（它们不可能含中文情报内容）
 SKIP_SCAN_SUFFIX = (".png", ".jpg", ".jpeg", ".ico", ".woff", ".woff2", ".ttf")
@@ -40,19 +46,40 @@ SKIP_SCAN_SUFFIX = (".png", ".jpg", ".jpeg", ".ico", ".woff", ".woff2", ".ttf")
 # 扫描器自身含关键词表，跳过（自引用）
 SKIP_SCAN_FILES = {"scripts/export_public.py"}
 
-# 白名单：这些文件里的这些串属正当署名（MIT 要求写明著作权人），不算泄露。
-# 若不想公开公司名，把 LICENSE 第 3 行改成个人/中性名义，然后把下面这行清空即可。
-ALLOWED: dict[str, set[str]] = {
-    "LICENSE": {"佛山", "海猫"},
-}
-
 
 def git(*args: str) -> bytes:
     return subprocess.run(["git", *args], cwd=ROOT, check=True,
                           stdout=subprocess.PIPE).stdout
 
 
-def scan(zip_bytes: bytes) -> list[tuple[str, int, str]]:
+def load_policy() -> tuple[list[str], dict[str, set[str]]]:
+    """黑名单/白名单从私有配置读，避免把真实产品线名写进公开脚本。"""
+    blocklist = list(DEFAULT_BLOCKLIST)
+    allowed: dict[str, set[str]] = {}
+
+    env = os.environ.get("NRI_EXPORT_BLOCKLIST", "").strip()
+    if env:
+        blocklist += [t.strip() for t in env.split(",") if t.strip()]
+
+    cfg_path = ROOT / "config.local.json"
+    if cfg_path.exists():
+        try:
+            cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+        except Exception as exc:  # noqa: BLE001
+            print(f"! 读取 config.local.json 失败：{exc}")
+            cfg = {}
+        blocklist += [t for t in cfg.get("export_blocklist", []) if t]
+        for fname, toks in (cfg.get("export_allow") or {}).items():
+            allowed.setdefault(fname, set()).update(toks)
+
+    # 去重保序
+    seen: set[str] = set()
+    uniq = [t for t in blocklist if not (t in seen or seen.add(t))]
+    return uniq, allowed
+
+
+def scan(zip_bytes: bytes, blocklist: list[str],
+         allowed: dict[str, set[str]]) -> list[tuple[str, int, str]]:
     """返回 [(文件名, 行号, 命中片段)]"""
     hits: list[tuple[str, int, str]] = []
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
@@ -64,16 +91,16 @@ def scan(zip_bytes: bytes) -> list[tuple[str, int, str]]:
             if rel in SKIP_SCAN_FILES:
                 continue
             base = info.filename.rsplit("/", 1)[-1]
-            allowed = ALLOWED.get(base, set())
+            allow = allowed.get(base, set())
             raw = zf.read(info)
             try:
                 text = raw.decode("utf-8")
             except UnicodeDecodeError:
                 continue
             for i, line in enumerate(text.splitlines(), 1):
-                for token in FORBIDDEN:
-                    if token in line and token not in allowed:
-                        hits.append((info.filename, i, token))
+                for token in blocklist:
+                    if token in line and token not in allow:
+                        hits.append((rel, i, token))
     return hits
 
 
@@ -104,7 +131,13 @@ def main() -> int:
     print(f"  已跟踪文件 {n_files} 个，压缩后 {len(blob)/1024:.0f} KB")
 
     print("→ 泄露扫描…")
-    hits = scan(blob)
+    blocklist, allowed = load_policy()
+    if not blocklist:
+        print("  ! 未配置黑名单（config.local.json 的 export_blocklist），本次只做结构性检查。")
+        print("    建议在你的私有配置里列出内部产品线名 / 内部工具名 / 内网网段。")
+    else:
+        print(f"  黑名单 {len(blocklist)} 条（来自私有配置）")
+    hits = scan(blob, blocklist, allowed)
     if hits:
         print(f"\n✖ 命中 {len(hits)} 处敏感串，**不产出压缩包**：")
         for f, line_no, token in hits[:40]:

@@ -1,5 +1,13 @@
 {
   "news_dir": "content/news",
   "social_dir": "content/social",
-  "publish_dir": "publish"
+  "publish_dir": "publish",
+  "export_blocklist": [
+    "<你的内部产品线名>",
+    "<内部工具名>",
+    "<局域网网段前缀>"
+  ],
+  "export_allow": {
+    "LICENSE": ["<你的公司名>"]
+  }
 }
