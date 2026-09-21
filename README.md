@@ -148,6 +148,18 @@ python scripts/export_public.py            # 导出到 dist/ 并打 zip
 ```
 
 导出的包只含仓库里已提交的公开文件（示例数据 + 代码 + 离线依赖），不含任何真实情报。
+包里会额外补一份 `data/dataset.js`（= 示例数据的副本），所以**解压后直接打开 `index.html` 就能看到地球**，无需任何额外步骤。
+
+泄露黑名单不写在公开脚本里，而是在你的私有 `config.local.json` 里配：
+
+```json
+{
+  "export_blocklist": ["<你的内部产品线名>", "<内部工具名>", "<局域网网段前缀>"],
+  "export_allow": { "LICENSE": ["<你的公司名>"] }
+}
+```
+
+扫描命中时**不会产出压缩包**（fail-closed），会列出命中位置供你清理。
 
 ## 许可
 

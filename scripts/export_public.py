@@ -104,10 +104,28 @@ def scan(zip_bytes: bytes, blocklist: list[str],
     return hits
 
 
+def add_demo_dataset(zip_bytes: bytes, prefix: str) -> bytes:
+    """往导出包里补一份 data/dataset.js = 示例数据，让解压后 index.html 直接能看。
+
+    仓库里的 data/dataset.js 是私有真实情报（已 gitignore），对外包里放的是
+    dataset.example.js 的副本，纯演示数据。
+    """
+    example = git("show", "HEAD:data/dataset.example.js")
+    src = zipfile.ZipFile(io.BytesIO(zip_bytes))
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as dst:
+        for info in src.infolist():
+            dst.writestr(info, src.read(info))
+        dst.writestr(f"{prefix}data/dataset.js", example)
+    return buf.getvalue()
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--version", default=date.today().isoformat())
     ap.add_argument("--out", default=str(ROOT / "dist"))
+    ap.add_argument("--no-demo-data", action="store_true",
+                    help="不在包里放示例 data/dataset.js（解压后需自行 build）")
     args = ap.parse_args()
 
     name = f"NriGlobe-{args.version}"
@@ -129,6 +147,10 @@ def main() -> int:
     with zipfile.ZipFile(io.BytesIO(blob)) as zf:
         n_files = sum(1 for i in zf.infolist() if not i.is_dir())
     print(f"  已跟踪文件 {n_files} 个，压缩后 {len(blob)/1024:.0f} KB")
+
+    if not args.no_demo_data:
+        blob = add_demo_dataset(blob, f"{name}/")
+        print("  已补入示例 data/dataset.js（解压后 index.html 直接可看）")
 
     print("→ 泄露扫描…")
     blocklist, allowed = load_policy()
